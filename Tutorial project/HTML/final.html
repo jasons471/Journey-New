@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en" style="background:black; color: white;
+"> <!-- Sets the background and text color-->
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+  <ul> <!--This contains unordered list-->
+<li>Python</li>
+<ul>
+    <li>Difficulty: Easy</li>
+    <li>Popularity: High</li>
+</ul>
+<li>Java</li>
+<ol> <!--This contains ordered list-->
+    <li>Difficulty: Medium</li>
+    <li>Popularity: High</li>
+</ol>
+<ul>
+<li>C</li>
+<ul>
+    <li>Difficulty: Hard</li>
+    <li>Popularity: Medium</li>
+</ul>
+<br>  
+<table>
+<thead> <!--This contains table header-->
+<caption>Coding Popularity Data</caption>
+<!--This contains table caption-->
+<tr> <!--This contains table row-->
+    <th>Language</th> <!--This contains table header-->
+    <th>Difficulty</th>
+    <th>Popularity</th>
+</tr>
+</thead>
+<tbody> <!--This contains table body-->
+<tr>
+    <td>Python</td> <!--This contains table data-->
+    <td>Easy</td>
+    <td>High</td>
+</tr>
+</tbody>
+</table>
+<table>
+<thead>
+<tr>
+<th colspan="2">Coding Popularity Data</th>
+<!--This contains table header with colspan attribute
+-->
+</tr>
+</thead>
+<tbody>
+<tr>
+    <td>Javascript</td>
+    <td>Medium</td>
+</tbody>
+</table>
+<form action="final.html" method="post">
+    <!--This contains form
+    action attribute is used to specify the URL where the form data should be sent.
+    method attribute is used to specify the 
+    HTTP() method to be used when sending form data.
+    -->
+    <input type="text" placeholder="Enter your name">
+    <!--This contains input field
+    type attribute is used to specify the type of 
+    input field.
+    placeholder attribute is used to specify a short hint that describes the expected value of an input field.
+    -->
+    <input type="password" placeholder="Enter your password">
+
+</form>
+<br>
+<label>
+<!--This contains label. Can choose one value only-->
+    <input type="radio" value = "Yes" name="radio">Yes
+    <!--This contains radio button
+    value attribute is used to specify the value 
+    of the radio button.
+    name attribute is used to specify the name of the radio button.
+    -->
+    <input type="radio" value = "No" name="radio">No
+<br>
+</label>
+<label for="math">
+    <!--This contains label. Can choose multiple values-->
+    <input type="checkbox" value = "Math" name="Subject" id="101">Math
+</label>
+</body>
+</html>
