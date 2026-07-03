@@ -23,7 +23,7 @@ int main() {
     n = Insert_Element(arr, &n);
 
     // Display the array after insertion
-    printf("\nThe array after insertion of %%d is: "); 
+    printf("\nThe array after insertion of %d is: ", n);
     Display_Array(arr, n);
 
     return 0;

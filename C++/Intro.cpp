@@ -1,5 +1,5 @@
 #include <bits/stdc++.h>
-/*this header file allows to call all variables
+/* this header file allows to call all variables
 for use in the code instead of calling one 
 particular header file at a time.*/
 using namespace std; 
