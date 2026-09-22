@@ -2,7 +2,7 @@ public class HelloWorld {
     /* public means accessible from anywhere
      * class is a blueprint for creating objects  */
     /* Anything inside the class is accessible to all other classes in the same package and is object of that class */
-     int a;
+     int a,b;
      String value;
      void display() {
         /* void means that the method does not return any value */
@@ -11,6 +11,8 @@ public class HelloWorld {
          * out is a static member of the System class that represents the standard output stream
          * println is a method of the PrintStream class that prints the specified message to the console
          * + is used to add concatenation */
+        System.out.println("b " + b);
+        System.out.println(value);
      }
     public static void main(String[] args) {
         /* static means that the method belongs to the class rather than an instance of the class
@@ -22,7 +24,8 @@ public class HelloWorld {
         /* Create an object of the HelloWorld class 
          * new is memory allocator for the object */
         obj1.a = 10;
-        /* Assign value 10 to variable a of the method*/
+        obj1.b = 20;
+        /* Assign value to variables of the method*/
         obj1.value = "Hello World";
         obj1.display();
         /* Call the display method of the HelloWorld class to print the values of a, b, and value */
