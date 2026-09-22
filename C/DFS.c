@@ -115,6 +115,8 @@ void dfs(int start, int end) {
     printf("🏆 Triumph! You have conquered the challenges and arrived at %s! Quest Complete! 🌟\n\n", village[end]);
 }
 
+
+
 int main() {
     printf("🧙‍♂️ Welcome, adventurer! Name the 9 mystical villages in your realm:\n");
     for (int i = 0; i < N; i++) {// Input village names
