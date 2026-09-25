@@ -2,28 +2,28 @@
 
 // Function to perform Selection Sort on an array
 void selectionSort(int arr[], int n) {
-    int i, j, min_idx, temp;
+    int i, j, min, temp;
 
     // Loop through the entire array up to the second-to-last element
     for (i = 0; i < n - 1; i++) {
         
         // Assume the current position 'i' holds the minimum element
-        min_idx = i;
+        min = i;
 
         // Loop through the unsorted part of the array to find the true minimum
         for (j = i + 1; j < n; j++) {
             
             // Check if the current element is smaller than our recorded minimum
-            if (arr[j] < arr[min_idx]) {
-                min_idx = j; // Update the index of the new minimum element
+            if (arr[j] < arr[min]) {
+                min = j; // Update the index of the new minimum element
             }
         }
 
-        // Swap the found minimum element with the first element of the unsorted section
-        if (min_idx != i) {
+        // Swap() if the minimum element found is not already in the correct position
+        if (min != i) {
             temp = arr[i];        // Store original element in a temporary variable
-            arr[i] = arr[min_idx]; // Place the minimum element in its correct sorted spot
-            arr[min_idx] = temp;  // Move the original element to the minimum's previous position
+            arr[i] = arr[min]; // Place the minimum element in its correct sorted spot
+            arr[min] = temp;  // Move the original element to the minimum's previous position
         }
     }
 }
