@@ -26,7 +26,6 @@ void printArray(int arr[], int size) {
     for (int i = 0; i < size; i++) {
         printf("%d ", arr[i]); // Print each element followed by a space
     }
-    printf("\n"); // Print a newline character at the end
 }
 
 int main() {
