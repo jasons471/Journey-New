@@ -1,4 +1,7 @@
-public class HelloWorld {
+    package Jason;
+    // package is a keyword used to define a package in Java
+
+    public class HelloWorld {
     /* public means accessible from anywhere
      * class is a blueprint for creating objects  */
     /* Anything inside the class is accessible to all other classes in the same package and is object of that class */
