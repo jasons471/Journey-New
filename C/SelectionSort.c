@@ -28,12 +28,10 @@ void selectionSort(int arr[], int n) {
     }
 }
 
-// Helper function to print the elements of an array
 void printArray(int arr[], int size) {
     for (int i = 0; i < size; i++) {
-        printf("%d ", arr[i]); // Print each element followed by a space
+        printf("%d ", arr[i]);
     }
-    printf("\n"); // Print a new line after the entire array is displayed
 }
 
 int main() {
