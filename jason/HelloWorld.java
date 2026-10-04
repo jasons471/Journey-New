@@ -1,4 +1,4 @@
-    package Jason;
+    package jason;
     // package is a keyword used to define a package in Java
 
     public class HelloWorld {
