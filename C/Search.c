@@ -1,120 +1,226 @@
-#include <stdio.h>
+#include <stdio.h>  
 
-// --- FUNCTION PROTOTYPES ---
-void Input_Array(int arr[], int n);
-void Display_Array(int arr[], int n);
-int Delete_Element(int arr[], int n, int pos);
-int Linear_Search(int arr[], int n, int x);
-int Binary_Search(int arr[], int x, int low, int high);
+// Declare global counter for total comparisons performed in search operations
+long long comparisons = 0;
 
-int main() {
-    int n, pos, x, choice, result;
-    int arr[20]; // Defined with a standard size
-
-    printf("Enter number of elements: ");
-    scanf("%d", &n);
-
-    // Initializing the array
-    Input_Array(arr, n);
-
-    printf("\nChoose an operation:\n1. Delete Element\n2. Linear Search\n3. Binary Search\n");
-    printf("Enter choice: ");
-    scanf("%d", &choice);
-
-    switch(choice) {
-        case 1:
-            // --- DELETION LOGIC ---
-            printf("\nEnter delete position: ");
-            scanf("%d", &pos);
-            n = Delete_Element(arr, n, pos);
-            Display_Array(arr, n);
-            break;
-
-        case 2:
-            // --- LINEAR SEARCH LOGIC ---
-            printf("\nEnter item to search: ");
-            scanf("%d", &x);
-            result = Linear_Search(arr, n, x);
-            if (result == -1) {
-                printf("Not found\n");
-            } else {
-                printf("Value found at location: %d\n", result);
-            }
-            break;
-
-        case 3:
-            // --- BINARY SEARCH LOGIC ---
-            // Note: Binary search requires a sorted array
-            printf("\nEnter target item: ");
-            scanf("%d", &x);
-            // low is 0, high is n-1
-            result = Binary_Search(arr, x, 0, n - 1);
-            if (result == -1) {
-                printf("Element not found\n");
-            } else {
-                printf("Element found at index %d\n", result);
-            }
-            break;
-
-        default:
-            printf("Invalid choice\n");
+void printArray(int arr[], int size) {
+    for (int i = 0; i < size; i++) {
+        printf("%d ", arr[i]);
     }
-
-    return 0;
+    printf("\n");
 }
 
-// --- FUNCTION DEFINITIONS ---
+// Function to perform linear search on an unsorted array
+int linearSearch(int arr[], int n, int x) {
+    // Reset comparison counter before starting the search
+    comparisons = 0;
 
-// Deletion: Shift elements left to overwrite the target position
-void Input_Array(int arr[], int n) {
-    int i;
-    for (i = 0; i < n; i++) {
-        printf("arr[%d] = ", i);
-        scanf("%d", &arr[i]);
-    }
-}
+    // Scan sequentially through each index of the array from 0 to n - 1
+    for (int i = 0; i < n; i++) {
+        // Increment comparison counter for the current element check
+        comparisons++;
 
-int Delete_Element(int arr[], int n, int pos) {
-    int i;
-    for (i = pos; i < n - 1; i++) {
-        arr[i] = arr[i + 1];
-    }
-    n = n - 1;
-    return n;
-}
+        // Display current element being inspected during the scan
+        printf("  Iteration %d: Checking arr[%d] = %d against target %d\n", i + 1, i, arr[i], x);
 
-void Display_Array(int arr[], int n) {
-    int i;
-    printf("\nThe array after deletion is:\n");
-    for (i = 0; i < n; i++) {
-        printf("arr[%d] = %d\n", i, arr[i]);
-    }
-}
-
-// Linear Search: Check every element sequentially
-int Linear_Search(int arr[], int n, int x) {
-    int i;
-    for (i = 0; i < n; i++) {
+        // Check if current array element matches the search target
         if (arr[i] == x) {
+            // Return index where target element was found
             return i;
         }
     }
+
+    // Return -1 if target is not present in the array
     return -1;
 }
 
-// Binary Search: Divide and conquer on a sorted array
-int Binary_Search(int arr[], int x, int low, int high) {
+// Binary Search for ASCENDING sorted arrays (smaller elements at left, larger at right)
+int binarySearchAscending(int arr[], int n, int x) {
+    // Reset comparison counter before starting the search
+    comparisons = 0;
+
+    // Set lower search boundary to the first index
+    int low = 0;
+    // Set upper search boundary to the last index
+    int high = n - 1;
+    // Step tracker for visual trace
+    int step = 1;
+
+    // Continue loop as long as the search window is valid
     while (low <= high) {
+        // Compute middle index without integer overflow
         int mid = low + (high - low) / 2;
-        
+
+        // Print active search boundaries and middle element for this step
+        printf("  Step %d: Range [%d to %d], Mid index = %d, Mid value = %d\n", step++, low, high, mid, arr[mid]);
+
+        // Increment comparison counter for checking equality
+        comparisons++;
+
+        // Check if the middle element is equal to the target
         if (arr[mid] == x) {
+            // Return index of found element
             return mid;
         }
+
+        // Increment comparison counter for determining search direction
+        comparisons++;
+
+        // In ascending order, if middle element is less than target, target lies in right half
         if (arr[mid] < x) {
+            // Shift lower boundary to eliminate left half and mid
             low = mid + 1;
         } else {
+            // Shift upper boundary to eliminate right half and mid
             high = mid - 1;
         }
     }
+
+    // Return -1 if element was not found in the array
     return -1;
+}
+
+// Binary Search for DESCENDING sorted arrays (larger elements at left, smaller at right)
+int binarySearchDescending(int arr[], int n, int x) {
+    // Reset comparison counter before starting the search
+    comparisons = 0;
+
+    // Set lower search boundary to the first index
+    int low = 0;
+    // Set upper search boundary to the last index
+    int high = n - 1;
+    // Step tracker for visual trace
+    int step = 1;
+
+    // Continue loop as long as the search window is valid
+    while (low <= high) {
+        // Compute middle index without integer overflow
+        int mid = low + (high - low) / 2;
+
+        // Print active search boundaries and middle element for this step
+        printf("  Step %d: Range [%d to %d], Mid index = %d, Mid value = %d\n", step++, low, high, mid, arr[mid]);
+
+        // Increment comparison counter for checking equality
+        comparisons++;
+
+        // Check if the middle element matches target
+        if (arr[mid] == x) {
+            // Return index of found element
+            return mid;
+        }
+
+        // Increment comparison counter for determining search direction
+        comparisons++;
+
+        // In descending order, if middle element is less than target, target lies in left half
+        if (arr[mid] < x) {
+            // Shift upper boundary to eliminate right half and mid
+            high = mid - 1;
+        } else {
+            // Shift lower boundary to eliminate left half and mid
+            low = mid + 1;
+        }
+    }
+
+    // Return -1 if element was not found in the array
+    return -1;
+}
+
+int main() {
+    int arrUnsorted[] = {45, 12, 89, 34, 7, 23};
+    // Compute total number of elements in unsorted array
+    int nUnsorted = sizeof(arrUnsorted) / sizeof(arrUnsorted[0]);
+
+    // Declare and initialize an ascending sorted array for Ascending Binary Search
+    int arrAsc[] = {7, 12, 23, 34, 45, 89};
+    // Compute total number of elements in ascending array
+    int nAsc = sizeof(arrAsc) / sizeof(arrAsc[0]);
+
+    // Declare and initialize a descending sorted array for Descending Binary Search
+    int arrDesc[] = {89, 45, 34, 23, 12, 7};
+    // Compute total number of elements in descending array
+    int nDesc = sizeof(arrDesc) / sizeof(arrDesc[0]);
+
+    // Target value to search for
+    int target = 34;
+    // Variable to hold the resulting index
+    int index;
+
+    // ==================== 1. LINEAR SEARCH DEMO ====================
+
+    printf("==================== 1. LINEAR SEARCH ====================\n");
+    // Display array being searched
+    printf("Array: ");
+    printArray(arrUnsorted, nUnsorted);
+    // Print target item
+    printf("Target item: %d\n", target);
+    printf("Search trace:\n");
+
+    index = linearSearch(arrUnsorted, nUnsorted, target);
+
+    // Check if target was found
+    if (index != -1) {
+        // Display location of element
+        printf("Result: Target %d found at index %d\n", target, index);
+    } else {
+        // Display not found message
+        printf("Result: Target %d not found\n", target);
+    }
+    // Display total comparisons performed
+    printf("Total comparisons: %lld\n", comparisons);
+    
+
+    // ==================== 2. ASCENDING BINARY SEARCH DEMO ====================
+
+    printf("================ 2. BINARY SEARCH (ASCENDING) ================\n");
+    printf("Array: ");
+    printArray(arrAsc, nAsc);
+    // Print target item
+    printf("Target item: %d\n", target);
+    printf("Search trace:\n");
+
+    // Execute ascending binary search
+    index = binarySearchAscending(arrAsc, nAsc, target);
+
+    // Check if target was found
+    if (index != -1) {
+        // Display location of element
+        printf("Result: Target %d found at index %d\n", target, index);
+    } else {
+        // Display not found message
+        printf("Result: Target %d not found\n", target);
+    }
+    // Display total comparisons performed
+    printf("Total comparisons: %lld\n", comparisons);
+    // Note shift count
+    printf("Total shifts: 0 (Searching does not move or shift array elements)\n\n");
+
+    // ==================== 3. DESCENDING BINARY SEARCH DEMO ====================
+    
+    printf("================ 3. BINARY SEARCH (DESCENDING) ================\n");
+    // Display sorted array being searched
+    printf("Array: ");
+    printArray(arrDesc, nDesc);
+    // Print target item
+    printf("Target item: %d\n", target);
+    printf("Search trace:\n");
+
+    // Execute descending binary search
+    index = binarySearchDescending(arrDesc, nDesc, target);
+
+    // Check if target was found
+    if (index != -1) {
+        // Display location of element
+        printf("Result: Target %d found at index %d\n", target, index);
+    } else {
+        // Display not found message
+        printf("Result: Target %d not found\n", target);
+    }
+    // Display total comparisons performed
+    printf("Total comparisons: %lld\n", comparisons);
+    // Note shift count
+    printf("Total shifts: 0 (Searching does not move or shift array elements)\n");
+
+    
+    return 0;
 }

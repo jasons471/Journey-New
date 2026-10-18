@@ -1,99 +1,28 @@
-#include <stdio.h>  
-#include <stdlib.h> 
+#include <stdio.h> 
 
-// Function to merge two sorted sub-arrays into a single sorted sub-array
-void merge(int arr[], int left, int mid, int right) {
-    // Calculate the size of the left sub-array
-    int l1 = mid - left + 1;
-    // Calculate the size of the right sub-array
-    int r1 = right - mid;
+// Global tracking variables to eliminate all pointer arguments
+long long comparisons = 0;
+long long shifts = 0;
 
-    // Dynamically allocate memory for temporary left array
-    int *L = (int *)malloc(l1 * sizeof(int));
-    // Dynamically allocate memory for temporary right array
-    int *R = (int *)malloc(r1 * sizeof(int));
-
-    // Copy data from main array into temporary left array
-    for (int i = 0; i < l1; i++) {
-        // Offset by 'left' index to get elements from the left partition
-        L[i] = arr[left + i];
-    }
-
-    // Copy data from main array into temporary right array
-    for (int j = 0; j < r1; j++) {
-        // Offset by 'mid + 1' index to get elements from the right partition
-        R[j] = arr[mid + 1 + j];
-    }
-
-    // Initial index of first sub-array
-    int i = 0;
-    // Initial index of second sub-array
-    int j = 0;
-    // Initial index of merged sub-array starting at 'left'
-    int k = left;
-
-    // Compare elements of both sub-arrays and place the smaller one into arr
-    while (i < l1 && j < r1) {
-        // Check if the current element in L is smaller or equal to current in R
-        if (L[i] <= R[j]) {
-            // Assign the smaller element from L to arr
-            arr[k] = L[i];
-            // Move pointer in L forward
-            i++;
+// Function to print a sub-array formatted with brackets: [x y z]
+void printSubArray(int arr[], int start, int end) {
+    // Print opening bracket
+    printf("[");
+    // Iterate from start to end index
+    for (int i = start; i <= end; i++) {
+        // Print value with trailing space if not the final element
+        if (i < end) {
+            printf("%d ", arr[i]);
         } else {
-            // Assign the smaller element from R to arr
-            arr[k] = R[j];
-            // Move pointer in R forward
-            j++;
+            // Print final element without trailing space
+            printf("%d", arr[i]);
         }
-        // Move pointer in the merged array forward
-        k++;
     }
-
-    // Copy any remaining elements of L[] if any are left
-    while (i < l1) {
-        // Place remaining element into arr
-        arr[k] = L[i];
-        // Increment pointer for L
-        i++;
-        // Increment pointer for arr
-        k++;
-    }
-
-    // Copy any remaining elements of R[] if any are left
-    while (j < r1) {
-        // Place remaining element into arr
-        arr[k] = R[j];
-        // Increment pointer for R
-        j++;
-        // Increment pointer for arr
-        k++;
-    }
-
-    // Free dynamically allocated memory for L to prevent memory leaks
-    free(L);
-    // Free dynamically allocated memory for R to prevent memory leaks
-    free(R);
+    // Print closing bracket
+    printf("]");
 }
 
-// Recursive function that implements Merge Sort
-void mergeSort(int arr[], int left, int right) {
-    // Base condition: continue only if the range contains at least two elements
-    if (left < right) {
-        // Calculate the midpoint to avoid integer overflow: left + (right - left) / 2
-        int mid = left + (right - left) / 2;
-
-        // Recursively sort the left half
-        mergeSort(arr, left, mid);
-
-        // Recursively sort the right half
-        mergeSort(arr, mid + 1, right);
-
-        // Merge the two sorted halves together
-        merge(arr, left, mid, right);
-    }
-}
-
+// Function to print the entire array with space separation
 void printArray(int arr[], int size) {
     for (int i = 0; i < size; i++) {
         printf("%d ", arr[i]);
@@ -101,14 +30,266 @@ void printArray(int arr[], int size) {
     printf("\n");
 }
 
+// Merge function for ASCENDING order without any pointers
+void mergeAscending(int arr[], int left, int mid, int right) {
+    // Size of left portion
+    int l1 = mid - left + 1;
+    // Size of right portion
+    int r1 = right - mid;
+
+    // Temporary local arrays
+    int L[l1];
+    int R[r1];
+
+    // Populate temporary left array
+    for (int i = 0; i < l1; i++) {
+        // Copy item from main array
+        L[i] = arr[left + i];
+        // Increment shifts counter
+        shifts++;
+    }
+
+    // Populate temporary right array
+    for (int j = 0; j < r1; j++) {
+        // Copy item from main array
+        R[j] = arr[mid + 1 + j];
+        // Increment shifts counter
+        shifts++;
+    }
+
+    // Display sub-arrays being merged
+    printf("Merging: ");
+    printSubArray(arr, left, mid);
+    printf(" + ");
+    printSubArray(arr, mid + 1, right);
+    printf("\n");
+
+    // Sub-array indexes
+    int i = 0;
+    int j = 0;
+    int k = left;
+
+    // Merge in ascending order
+    while (i < l1 && j < r1) {
+        // Increment comparison counter
+        comparisons++;
+
+        // Check for smaller or equal element
+        if (L[i] <= R[j]) {
+            // Place from left array
+            arr[k] = L[i];
+            // Move index forward
+            i++;
+        } else {
+            // Place from right array
+            arr[k] = R[j];
+            // Move index forward
+            j++;
+        }
+        // Increment shifts counter
+        shifts++;
+        // Move destination index
+        k++;
+    }
+
+    // Copy remaining items from left sub-array
+    while (i < l1) {
+        // Assign item
+        arr[k] = L[i];
+        // Advance left index
+        i++;
+        // Advance main index
+        k++;
+        // Increment shifts counter
+        shifts++;
+    }
+
+    // Copy remaining items from right sub-array
+    while (j < r1) {
+        // Assign item
+        arr[k] = R[j];
+        // Advance right index
+        j++;
+        // Advance main index
+        k++;
+        // Increment shifts counter
+        shifts++;
+    }
+
+    // Display intermediate merged result
+    printf("Result:  ");
+    printSubArray(arr, left, right);
+    printf("\n\n");
+}
+
+// Recursive Merge Sort function for ASCENDING order without any pointers
+void mergeSortAscending(int arr[], int left, int right) {
+    // Only continue if segment has 2 or more elements
+    if (left < right) {
+        // Calculate middle point
+        int mid = left + (right - left) / 2;
+
+        // Sort left partition
+        mergeSortAscending(arr, left, mid);
+
+        // Sort right partition
+        mergeSortAscending(arr, mid + 1, right);
+
+        // Merge both partitions in ascending order
+        mergeAscending(arr, left, mid, right);
+    }
+}
+
+// Merge function for DESCENDING order without any pointers
+void mergeDescending(int arr[], int left, int mid, int right) {
+    // Size of left portion
+    int l1 = mid - left + 1;
+    // Size of right portion
+    int r1 = right - mid;
+
+    // Temporary local arrays
+    int L[l1];
+    int R[r1];
+
+    // Populate temporary left array
+    for (int i = 0; i < l1; i++) {
+        // Copy item from main array
+        L[i] = arr[left + i];
+        // Increment shifts counter
+        shifts++;
+    }
+
+    // Populate temporary right array
+    for (int j = 0; j < r1; j++) {
+        // Copy item from main array
+        R[j] = arr[mid + 1 + j];
+        // Increment shifts counter
+        shifts++;
+    }
+
+    // Display sub-arrays being merged
+    printf("Merging: ");
+    printSubArray(arr, left, mid);
+    printf(" + ");
+    printSubArray(arr, mid + 1, right);
+    printf("\n");
+
+    // Sub-array indexes
+    int i = 0;
+    int j = 0;
+    int k = left;
+
+    // Merge in descending order
+    while (i < l1 && j < r1) {
+        // Increment comparison counter
+        comparisons++;
+
+        // Check for larger or equal element
+        if (L[i] >= R[j]) {
+            // Place from left array
+            arr[k] = L[i];
+            // Move index forward
+            i++;
+        } else {
+            // Place from right array
+            arr[k] = R[j];
+            // Move index forward
+            j++;
+        }
+        // Increment shifts counter
+        shifts++;
+        // Move destination index
+        k++;
+    }
+
+    // Copy remaining items from left sub-array
+    while (i < l1) {
+        // Assign item
+        arr[k] = L[i];
+        // Advance left index
+        i++;
+        // Advance main index
+        k++;
+        // Increment shifts counter
+        shifts++;
+    }
+
+    // Copy remaining items from right sub-array
+    while (j < r1) {
+        // Assign item
+        arr[k] = R[j];
+        // Advance right index
+        j++;
+        // Advance main index
+        k++;
+        // Increment shifts counter
+        shifts++;
+    }
+
+    // Display intermediate merged result
+    printf("Result:  ");
+    printSubArray(arr, left, right);
+    printf("\n\n");
+}
+
+// Recursive Merge Sort function for DESCENDING order without any pointers
+void mergeSortDescending(int arr[], int left, int right) {
+    // Only continue if segment has 2 or more elements
+    if (left < right) {
+        // Calculate middle point
+        int mid = left + (right - left) / 2;
+
+        // Sort left partition
+        mergeSortDescending(arr, left, mid);
+
+        // Sort right partition
+        mergeSortDescending(arr, mid + 1, right);
+
+        // Merge both partitions in descending order
+        mergeDescending(arr, left, mid, right);
+    }
+}
+
 int main() {
-    int arr[] = {38, 27, 43, 3, 9, 82, 10};
-    // Calculate total number of elements: total bytes divided by bytes per element
-    int n = sizeof(arr) / sizeof(arr[0]);
-    printf("Original array: \n");
-    printArray(arr, n);
-    mergeSort(arr, 0, n - 1);
-    printf("Sorted array: \n");
-    printArray(arr, n);
+    // Hardcoded example array to sort in ascending order
+    int arrAsc[] = {38, 27, 43, 3, 9, 82};
+    // Hardcoded example array to sort in descending order
+    int arrDesc[] = {38, 27, 43, 3, 9, 82};
+
+    // Calculate total number of elements
+    int n = sizeof(arrAsc) / sizeof(arrAsc[0]);
+
+    printf("Original array: ");
+    printArray(arrAsc, n);
+    printf("\n");
+
+    // Reset counters before ascending execution
+    comparisons = 0;
+    shifts = 0;
+
+    printf("- - - Merge Sort Steps (Ascending) - - -\n\n");
+    mergeSortAscending(arrAsc, 0, n - 1);
+
+    printf("Final sorted array (ascending): ");
+    printArray(arrAsc, n);
+
+    // Display comparisons and shifts count
+    printf("Number of comparisons: %lld\n", comparisons);
+    printf("Number of shifts: %lld\n\n", shifts);
+
+    // Reset counters before descending execution
+    comparisons = 0;
+    shifts = 0;
+
+
+    printf("- - - Merge Sort Steps (Descending) - - -\n\n");
+    mergeSortDescending(arrDesc, 0, n - 1);
+
+    printf("Final sorted array (descending): ");
+    printArray(arrDesc, n);
+
+    printf("Number of comparisons: %lld\n", comparisons);
+    printf("Number of shifts: %lld\n", shifts);
+
     return 0;
 }
