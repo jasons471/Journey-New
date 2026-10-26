@@ -3,6 +3,29 @@
 long long comparisons = 0;//total element comparisons across sorting routines
 long long shifts = 0; //total element shifts and data movements
 
+// Global counter for tracking partition step numbers in ascending sort
+int partitionStepAsc = 1;
+
+// Global counter for tracking partition step numbers in descending sort
+int partitionStepDesc = 1;
+
+// Helper function to print elements of a subarray enclosed in brackets [x y z]
+void printSubarray(int arr[], int start, int end) {
+    // Print opening bracket
+    printf("[");
+    // Loop through indices from start to end
+    for (int i = start; i <= end; i++) {
+        // Print the element value
+        printf("%d", arr[i]);
+        // Print space between elements if not the last element
+        if (i < end) {
+            printf(" ");
+        }
+    }
+    // Print closing bracket
+    printf("]");
+}
+
 // Function to display the intermediate array state with active partition and pivot highlights
 void printCurrentArray(int arr[], int total_size, int low, int high, int pivot_val) {
     // Iterate across every index of the full array
@@ -35,13 +58,28 @@ void swap(int arr[], int i, int j) {
     arr[i] = arr[j];
     // Assign stored temporary value to index j
     arr[j] = temp;
+    // Increment global shifts/data movements count by 3 for the swap assignment steps
+    shifts += 3;
 }
 
 // Function to partition subarray in ASCENDING order using Lomuto scheme
 int partitionAscending(int arr[], int low, int high, int total_size) {
+    // Print partition step header with step count
+    printf("Partition step %d\n", partitionStepAsc++);
+
+    // Print the current subarray and its active index bounds
+    printf("Current subarray (indices %d to %d): ", low, high);
+    // Display elements of the current subarray segment
+    printSubarray(arr, low, high);
+    // Print newline character
+    printf("\n");
+
     // Pick the element at the high boundary as the pivot
     int pivot = arr[high];
     
+    // Display selected pivot and its initial index position
+    printf("Selected pivot: %d, initial index: %d\n", pivot, high);
+
     // Initialize smaller element boundary tracker to one position before low
     int i = (low - 1);
 
@@ -81,6 +119,45 @@ int partitionAscending(int arr[], int low, int high, int total_size) {
     // Output array showing pivot fixed in place
     printCurrentArray(arr, total_size, low, high, pivot);
 
+    // Record final resting index of the pivot
+    int final_pivot_index = i + 1;
+
+    // Display the subarray state after partitioning
+    printf("Subarray after partitioning: ");
+    // Print elements of the partitioned subarray segment
+    printSubarray(arr, low, high);
+    // Print newline character
+    printf("\n");
+
+    // Check if left partition subarray has elements
+    if (final_pivot_index - 1 >= low) {
+        // Print left subarray header with valid index bounds
+        printf("Left subarray (indices %d to %d): ", low, final_pivot_index - 1);
+        // Print elements of left subarray
+        printSubarray(arr, low, final_pivot_index - 1);
+        // Print newline character
+        printf("\n");
+    } else {
+        // Print empty label if no elements exist on left
+        printf("Left subarray: [empty]\n");
+    }
+
+    // Display pivot value and its final index
+    printf("Pivot: %d, final index: %d\n", pivot, final_pivot_index);
+
+    // Check if right partition subarray has elements
+    if (final_pivot_index + 1 <= high) {
+        // Print right subarray header with valid index bounds
+        printf("Right subarray (indices %d to %d): ", final_pivot_index + 1, high);
+        // Print elements of right subarray
+        printSubarray(arr, final_pivot_index + 1, high);
+        // Print newline character
+        printf("\n\n");
+    } else {
+        // Print empty label if no elements exist on right
+        printf("Right subarray: [empty]\n\n");
+    }
+
     // Return final resting index of the pivot
     return (i + 1);
 }
@@ -101,9 +178,22 @@ void quickSortAscending(int arr[], int low, int high, int total_size) {
 }
 // Function to partition subarray in DESCENDING order using Lomuto scheme
 int partitionDescending(int arr[], int low, int high, int total_size) {
+    // Print partition step header with step count
+    printf("Partition step %d\n", partitionStepDesc++);
+
+    // Print the current subarray and its active index bounds
+    printf("Current subarray (indices %d to %d): ", low, high);
+    // Display elements of the current subarray segment
+    printSubarray(arr, low, high);
+    // Print newline character
+    printf("\n");
+
     // Pick the element at the high boundary as the pivot
     int pivot = arr[high];
     
+    // Display selected pivot and its initial index position
+    printf("Selected pivot: %d, initial index: %d\n", pivot, high);
+
     // Initialize larger element boundary tracker to one position before low
     int i = (low - 1);
 
@@ -142,6 +232,45 @@ int partitionDescending(int arr[], int low, int high, int total_size) {
     printf("Pivot placed: ");
     // Output array showing pivot fixed in place
     printCurrentArray(arr, total_size, low, high, pivot);
+
+    // Record final resting index of the pivot
+    int final_pivot_index = i + 1;
+
+    // Display the subarray state after partitioning
+    printf("Subarray after partitioning: ");
+    // Print elements of the partitioned subarray segment
+    printSubarray(arr, low, high);
+    // Print newline character
+    printf("\n");
+
+    // Check if left partition subarray has elements
+    if (final_pivot_index - 1 >= low) {
+        // Print left subarray header with valid index bounds
+        printf("Left subarray (indices %d to %d): ", low, final_pivot_index - 1);
+        // Print elements of left subarray
+        printSubarray(arr, low, final_pivot_index - 1);
+        // Print newline character
+        printf("\n");
+    } else {
+        // Print empty label if no elements exist on left
+        printf("Left subarray: [empty]\n");
+    }
+
+    // Display pivot value and its final index
+    printf("Pivot: %d, final index: %d\n", pivot, final_pivot_index);
+
+    // Check if right partition subarray has elements
+    if (final_pivot_index + 1 <= high) {
+        // Print right subarray header with valid index bounds
+        printf("Right subarray (indices %d to %d): ", final_pivot_index + 1, high);
+        // Print elements of right subarray
+        printSubarray(arr, final_pivot_index + 1, high);
+        // Print newline character
+        printf("\n\n");
+    } else {
+        // Print empty label if no elements exist on right
+        printf("Right subarray: [empty]\n\n");
+    }
 
     // Return final resting index of the pivot
     return (i + 1);
@@ -183,6 +312,9 @@ int main() {
     // Reset shifts count before running ascending sort
     shifts = 0;
 
+    // Reset partition step counter before starting
+    partitionStepAsc = 1;
+
     // Execute ascending quicksort on the entire array
     quickSortAscending(arrAsc, 0, n - 1, n);
     printf("\nFinal Sorted array (Ascending): ");
@@ -206,6 +338,9 @@ int main() {
     comparisons = 0;
     // Reset shifts count before running descending sort
     shifts = 0;
+
+    // Reset partition step counter before starting
+    partitionStepDesc = 1;
 
     // Execute descending quicksort on the entire array
     quickSortDescending(arrDesc, 0, n - 1, n);
