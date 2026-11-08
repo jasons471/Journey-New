@@ -9,6 +9,9 @@ int partitionStepAsc = 1;
 // Global counter for tracking partition step numbers in descending sort
 int partitionStepDesc = 1;
 
+// Global variable to choose pivot position: value will be assigned via user input in main()
+int pivotChoice;
+
 // Helper function to print elements of a subarray enclosed in brackets [x y z]
 void printSubarray(int arr[], int start, int end) {
     // Print opening bracket
@@ -34,9 +37,10 @@ void printCurrentArray(int arr[], int total_size, int low, int high, int pivot_v
         if (i < low || i > high) {
             // Print inactive elements wrapped in parentheses
             printf(" (%d)", arr[i]);
+            // brackets indicate these elements are not part of the current partitioning step
         }
-        // Check if the element is the active pivot located at the high boundary
-        else if (arr[i] == pivot_val && i == high) {
+        // Check if the element matches the pivot value within the active range
+        else if (arr[i] == pivot_val) {
             // Print pivot marked with brackets and an asterisk
             printf(" [%d*]", arr[i]);
         }
@@ -62,7 +66,7 @@ void swap(int arr[], int i, int j) {
     shifts += 3;
 }
 
-// Function to partition subarray in ASCENDING order using Lomuto scheme
+// Function to partition subarray in ASCENDING order using Hoare's scheme (without while(1))
 int partitionAscending(int arr[], int low, int high, int total_size) {
     // Print partition step header with step count
     printf("Partition step %d\n", partitionStepAsc++);
@@ -74,53 +78,69 @@ int partitionAscending(int arr[], int low, int high, int total_size) {
     // Print newline character
     printf("\n");
 
-    // Pick the element at the high boundary as the pivot
-    int pivot = arr[high];
+    // Variable to record which initial index position the pivot was selected from
+    int selected_pivot_index;
+
+    // Check if user selected last element as pivot
+    if (pivotChoice == 2) {
+        // Record high as the original index of the pivot
+        selected_pivot_index = high;
+        // Swap last element with first element so Hoare's pointers can pivot off arr[low]
+        swap(arr, low, high);
+    } else {
+        // Record low as the original index of the pivot (First element)
+        selected_pivot_index = low;
+    }
+
+    // Pick pivot value from low position
+    int pivot = arr[low];
     
     // Display selected pivot and its initial index position
-    printf("Selected pivot: %d, initial index: %d\n", pivot, high);
+    printf("Selected pivot: %d, initial index: %d\n", pivot, selected_pivot_index);
 
-    // Initialize smaller element boundary tracker to one position before low
-    int i = (low - 1);
+    // Initialize left pointer to low
+    int i = low;
+    // Initialize right pointer to high
+    int j = high;
 
     // Print partition header indicating the active range and pivot value
-    printf("\n--- Partitioning Range [%d to %d] with Pivot = %d (Ascending) ---\n", low, high, pivot);
+    printf("\n--- Partitioning Range [%d to %d] with Pivot = %d (Ascending - Hoare) ---\n", low, high, pivot);
     // Print label for initial state before scan starts
     printf("Before pass:  ");
     // Output full array state highlighting the active sub-range and pivot
     printCurrentArray(arr, total_size, low, high, pivot);
 
-    // Scan through all elements from low to high - 1
-    for (int j = low; j < high; j++) {
-        // Increment global comparisons counter for this check
-        comparisons++;
+    // Run while pointers have not crossed (NO infinite loop / NO while(1))
+    while (i < j) {
+        // Advance left pointer while elements are smaller than or equal to pivot
+        while (i <= high && arr[i] <= pivot) {
+            i++;           // Move left index rightward
+            comparisons++; // Count comparison against pivot
+        }
 
-        // Determine if current element is smaller than or equal to pivot
-        if (arr[j] <= pivot) {
-            // Advance the smaller element boundary
-            i++;
-            // Check if boundary index and current index differ before swapping
-            if (i != j) {
-                // Swap elements at boundary index i and current scan index j
-                swap(arr, i, j);
-                // Print swapped element values
-                printf("  Swap %d & %d:  ", arr[j], arr[i]);
-                // Output intermediate array layout right after the swap
-                printCurrentArray(arr, total_size, low, high, pivot);
-            }
+        // Retreat right pointer while elements are strictly greater than pivot
+        while (j >= low && arr[j] > pivot) {
+            j--;           // Move right index leftward
+            comparisons++; // Count comparison against pivot
+        }
+
+        // Swap out-of-order elements only if pointers have not met or crossed
+        if (i < j) {
+            swap(arr, i, j);
+            // Print swapped element values
+            printf("  Swap %d & %d:  ", arr[j], arr[i]);
+            // Output intermediate array layout right after the swap
+            printCurrentArray(arr, total_size, low, high, pivot);
         }
     }
 
-    // Place pivot at its final sorted boundary position by swapping with index i + 1
-    swap(arr, i + 1, high);
+    // Place pivot from low into its resting position at index j
+    swap(arr, low, j);
 
     // Print label for array state after placing pivot
     printf("Pivot placed: ");
     // Output array showing pivot fixed in place
     printCurrentArray(arr, total_size, low, high, pivot);
-
-    // Record final resting index of the pivot
-    int final_pivot_index = i + 1;
 
     // Display the subarray state after partitioning
     printf("Subarray after partitioning: ");
@@ -130,11 +150,11 @@ int partitionAscending(int arr[], int low, int high, int total_size) {
     printf("\n");
 
     // Check if left partition subarray has elements
-    if (final_pivot_index - 1 >= low) {
+    if (j - 1 >= low) {
         // Print left subarray header with valid index bounds
-        printf("Left subarray (indices %d to %d): ", low, final_pivot_index - 1);
+        printf("Left subarray (indices %d to %d): ", low, j - 1);
         // Print elements of left subarray
-        printSubarray(arr, low, final_pivot_index - 1);
+        printSubarray(arr, low, j - 1);
         // Print newline character
         printf("\n");
     } else {
@@ -143,14 +163,14 @@ int partitionAscending(int arr[], int low, int high, int total_size) {
     }
 
     // Display pivot value and its final index
-    printf("Pivot: %d, final index: %d\n", pivot, final_pivot_index);
+    printf("Pivot: %d, final index: %d\n", pivot, j);
 
     // Check if right partition subarray has elements
-    if (final_pivot_index + 1 <= high) {
+    if (j + 1 <= high) {
         // Print right subarray header with valid index bounds
-        printf("Right subarray (indices %d to %d): ", final_pivot_index + 1, high);
+        printf("Right subarray (indices %d to %d): ", j + 1, high);
         // Print elements of right subarray
-        printSubarray(arr, final_pivot_index + 1, high);
+        printSubarray(arr, j + 1, high);
         // Print newline character
         printf("\n\n");
     } else {
@@ -159,24 +179,25 @@ int partitionAscending(int arr[], int low, int high, int total_size) {
     }
 
     // Return final resting index of the pivot
-    return (i + 1);
+    return j;
 }
 
-// Recursive function to execute Quick Sort in ASCENDING order
+// Recursive function to execute Quick Sort in ASCENDING order using Hoare's scheme
 void quickSortAscending(int arr[], int low, int high, int total_size) {
     // Ensure the subarray segment has at least two elements
     if (low < high) {
-        // Partition array and retrieve fixed pivot index
+        // Partition array and retrieve fixed pivot index j
         int pi = partitionAscending(arr, low, high, total_size);
 
-        // Recursively sort the elements to the left of the pivot
+        // Recursively sort left subarray from low to pi - 1
         quickSortAscending(arr, low, pi - 1, total_size);
 
-        // Recursively sort the elements to the right of the pivot
+        // Recursively sort right subarray from pi + 1 to high
         quickSortAscending(arr, pi + 1, high, total_size);
     }
 }
-// Function to partition subarray in DESCENDING order using Lomuto scheme
+
+// Function to partition subarray in DESCENDING order using Hoare's scheme (without while(1))
 int partitionDescending(int arr[], int low, int high, int total_size) {
     // Print partition step header with step count
     printf("Partition step %d\n", partitionStepDesc++);
@@ -188,53 +209,69 @@ int partitionDescending(int arr[], int low, int high, int total_size) {
     // Print newline character
     printf("\n");
 
-    // Pick the element at the high boundary as the pivot
-    int pivot = arr[high];
+    // Variable to record which initial index position the pivot was selected from
+    int selected_pivot_index;
+
+    // Check if user selected last element as pivot
+    if (pivotChoice == 2) {
+        // Record high as the original index of the pivot
+        selected_pivot_index = high;
+        // Swap last element with first element so Hoare's pointers can pivot off arr[low]
+        swap(arr, low, high);
+    } else {
+        // Record low as the original index of the pivot (First element)
+        selected_pivot_index = low;
+    }
+
+    // Pick pivot value from low position
+    int pivot = arr[low];
     
     // Display selected pivot and its initial index position
-    printf("Selected pivot: %d, initial index: %d\n", pivot, high);
+    printf("Selected pivot: %d, initial index: %d\n", pivot, selected_pivot_index);
 
-    // Initialize larger element boundary tracker to one position before low
-    int i = (low - 1);
+    // Initialize left pointer to low
+    int i = low;
+    // Initialize right pointer to high
+    int j = high;
 
     // Print partition header indicating the active range and pivot value
-    printf("\n--- Partitioning Range [%d to %d] with Pivot = %d (Descending) ---\n", low, high, pivot);
+    printf("\n--- Partitioning Range [%d to %d] with Pivot = %d (Descending - Hoare) ---\n", low, high, pivot);
     // Print label for initial state before scan starts
     printf("Before pass:  ");
     // Output full array state highlighting the active sub-range and pivot
     printCurrentArray(arr, total_size, low, high, pivot);
 
-    // Scan through all elements from low to high - 1
-    for (int j = low; j < high; j++) {
-        // Increment global comparisons counter for this check
-        comparisons++;
+    // Run while pointers have not crossed (NO infinite loop / NO while(1))
+    while (i < j) {
+        // Advance left pointer while elements are greater than or equal to pivot (descending)
+        while (i <= high && arr[i] >= pivot) {
+            i++;           // Move left index rightward
+            comparisons++; // Count comparison against pivot
+        }
 
-        // Determine if current element is greater than or equal to pivot
-        if (arr[j] >= pivot) {
-            // Advance the larger element boundary
-            i++;
-            // Check if boundary index and current index differ before swapping
-            if (i != j) {
-                // Swap elements at boundary index i and current scan index j
-                swap(arr, i, j);
-                // Print swapped element values
-                printf("  Swap %d & %d:  ", arr[j], arr[i]);
-                // Output intermediate array layout right after the swap
-                printCurrentArray(arr, total_size, low, high, pivot);
-            }
+        // Retreat right pointer while elements are strictly smaller than pivot (descending)
+        while (j >= low && arr[j] < pivot) {
+            j--;           // Move right index leftward
+            comparisons++; // Count comparison against pivot
+        }
+
+        // Swap out-of-order elements only if pointers have not met or crossed
+        if (i < j) {
+            swap(arr, i, j);
+            // Print swapped element values
+            printf("  Swap %d & %d:  ", arr[j], arr[i]);
+            // Output intermediate array layout right after the swap
+            printCurrentArray(arr, total_size, low, high, pivot);
         }
     }
 
-    // Place pivot at its final sorted boundary position by swapping with index i + 1
-    swap(arr, i + 1, high);
+    // Place pivot from low into its resting position at index j
+    swap(arr, low, j);
 
     // Print label for array state after placing pivot
     printf("Pivot placed: ");
     // Output array showing pivot fixed in place
     printCurrentArray(arr, total_size, low, high, pivot);
-
-    // Record final resting index of the pivot
-    int final_pivot_index = i + 1;
 
     // Display the subarray state after partitioning
     printf("Subarray after partitioning: ");
@@ -244,11 +281,11 @@ int partitionDescending(int arr[], int low, int high, int total_size) {
     printf("\n");
 
     // Check if left partition subarray has elements
-    if (final_pivot_index - 1 >= low) {
+    if (j - 1 >= low) {
         // Print left subarray header with valid index bounds
-        printf("Left subarray (indices %d to %d): ", low, final_pivot_index - 1);
+        printf("Left subarray (indices %d to %d): ", low, j - 1);
         // Print elements of left subarray
-        printSubarray(arr, low, final_pivot_index - 1);
+        printSubarray(arr, low, j - 1);
         // Print newline character
         printf("\n");
     } else {
@@ -257,14 +294,14 @@ int partitionDescending(int arr[], int low, int high, int total_size) {
     }
 
     // Display pivot value and its final index
-    printf("Pivot: %d, final index: %d\n", pivot, final_pivot_index);
+    printf("Pivot: %d, final index: %d\n", pivot, j);
 
     // Check if right partition subarray has elements
-    if (final_pivot_index + 1 <= high) {
+    if (j + 1 <= high) {
         // Print right subarray header with valid index bounds
-        printf("Right subarray (indices %d to %d): ", final_pivot_index + 1, high);
+        printf("Right subarray (indices %d to %d): ", j + 1, high);
         // Print elements of right subarray
-        printSubarray(arr, final_pivot_index + 1, high);
+        printSubarray(arr, j + 1, high);
         // Print newline character
         printf("\n\n");
     } else {
@@ -273,20 +310,20 @@ int partitionDescending(int arr[], int low, int high, int total_size) {
     }
 
     // Return final resting index of the pivot
-    return (i + 1);
+    return j;
 }
 
-// Recursive function to execute Quick Sort in DESCENDING order
+// Recursive function to execute Quick Sort in DESCENDING order using Hoare's scheme
 void quickSortDescending(int arr[], int low, int high, int total_size) {
     // Ensure the subarray segment has at least two elements
     if (low < high) {
-        // Partition array and retrieve fixed pivot index
+        // Partition array and retrieve fixed pivot index j
         int pi = partitionDescending(arr, low, high, total_size);
 
-        // Recursively sort the elements to the left of the pivot
+        // Recursively sort left subarray from low to pi - 1
         quickSortDescending(arr, low, pi - 1, total_size);
 
-        // Recursively sort the elements to the right of the pivot
+        // Recursively sort right subarray from pi + 1 to high
         quickSortDescending(arr, pi + 1, high, total_size);
     }
 }
@@ -304,7 +341,16 @@ int main() {
     int arrDesc[] = {24, 9, 29, 14, 19, 27};
     int n = sizeof(arrAsc) / sizeof(arrAsc[0]);
 
-   printf("Original array (Ascending run):\n");
+    // Prompt user to select which pivot position rule to run
+    printf("Choose Pivot Position:\n");
+    printf("1. First Element as Pivot\n");
+    printf("2. Last Element as Pivot\n");
+    printf("Enter choice (1 or 2): ");
+    // Take user input directly inside main to initialize pivotChoice
+    scanf("%d", &pivotChoice);
+    printf("\n");
+
+    printf("Original array (Ascending run):\n");
     printArray(arrAsc, n);
 
     // Reset comparisons count before running ascending sort
@@ -330,7 +376,6 @@ int main() {
     // Print divider line between ascending and descending test runs
     printf("\n========================================================\n\n");
 
-
     printf("Original array (Descending run):\n");
     printArray(arrDesc, n);
 
@@ -352,6 +397,5 @@ int main() {
     printf("Number of comparisons: %lld\n", comparisons);
     // Display total shifts/data assignments performed during descending sort
     printf("Number of shifts: %lld\n", shifts);
-return 0;
-
+    return 0;
 }
