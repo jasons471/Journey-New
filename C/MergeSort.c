@@ -33,16 +33,16 @@ void printArray(int arr[], int size) {
 // Merge function for ASCENDING order 
 void mergeAscending(int arr[], int lb, int mid, int ub) {
     // Size of left portion
-    int l1 = mid - lb + 1;
+    int n1 = mid - lb + 1;
     // Size of right portion
-    int r1 = ub - mid;
+    int n2 = ub - mid;
 
     // Temporary local arrays
-    int L[l1];
-    int R[r1];
+    int L[n1];
+    int R[n2];
 
     // Populate temporary left array
-    for (int i = 0; i < l1; i++) {
+    for (int i = 0; i < n1; i++) {
         // Copy item from main array
         L[i] = arr[lb + i];
         // Increment shifts counter
@@ -50,7 +50,7 @@ void mergeAscending(int arr[], int lb, int mid, int ub) {
     }
 
     // Populate temporary right array
-    for (int j = 0; j < r1; j++) {
+    for (int j = 0; j < n2; j++) {
         // Copy item from main array
         R[j] = arr[mid + 1 + j];
         // Increment shifts counter
@@ -70,7 +70,7 @@ void mergeAscending(int arr[], int lb, int mid, int ub) {
     int k = lb;
 
     // Merge in ascending order
-    while (i < l1 && j < r1) {
+    while (i < n1 && j < n2) {
         // Increment comparison counter
         comparisons++;
 
@@ -93,7 +93,7 @@ void mergeAscending(int arr[], int lb, int mid, int ub) {
     }
 
     // Copy remaining items from left sub-array
-    while (i < l1) {
+    while (i < n1) {
         // Assign item
         arr[k] = L[i];
         // Advance left index
@@ -105,7 +105,7 @@ void mergeAscending(int arr[], int lb, int mid, int ub) {
     }
 
     // Copy remaining items from right sub-array
-    while (j < r1) {
+    while (j < n2) {
         // Assign item
         arr[k] = R[j];
         // Advance right index
@@ -143,16 +143,16 @@ void mergeSortAscending(int arr[], int lb, int ub) {
 // Merge function for DESCENDING order 
 void mergeDescending(int arr[], int lb, int mid, int ub) {
     // Size of left portion
-    int l1 = mid - lb + 1;
+    int n1 = mid - lb + 1;
     // Size of right portion
-    int r1 = ub - mid;
+    int n2 = ub - mid;
 
     // Temporary local arrays
-    int L[l1];
-    int R[r1];
+    int L[n1];
+    int R[n2];
 
     // Populate temporary left array
-    for (int i = 0; i < l1; i++) {
+    for (int i = 0; i < n1; i++) {
         // Copy item from main array
         L[i] = arr[lb + i];
         // Increment shifts counter
@@ -160,7 +160,7 @@ void mergeDescending(int arr[], int lb, int mid, int ub) {
     }
 
     // Populate temporary right array
-    for (int j = 0; j < r1; j++) {
+    for (int j = 0; j < n2; j++) {
         // Copy item from main array
         R[j] = arr[mid + 1 + j];
         // Increment shifts counter
@@ -180,7 +180,7 @@ void mergeDescending(int arr[], int lb, int mid, int ub) {
     int k = lb;
 
     // Merge in descending order
-    while (i < l1 && j < r1) {
+    while (i < n1 && j < n2) {
         // Increment comparison counter
         comparisons++;
 
@@ -203,7 +203,7 @@ void mergeDescending(int arr[], int lb, int mid, int ub) {
     }
 
     // Copy remaining items from left sub-array
-    while (i < l1) {
+    while (i < n1) {
         // Assign item
         arr[k] = L[i];
         // Advance left index
@@ -215,7 +215,7 @@ void mergeDescending(int arr[], int lb, int mid, int ub) {
     }
 
     // Copy remaining items from right sub-array
-    while (j < r1) {
+    while (j < n2) {
         // Assign item
         arr[k] = R[j];
         // Advance right index
