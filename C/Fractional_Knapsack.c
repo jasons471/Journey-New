@@ -84,16 +84,16 @@ void by_ratio(float weight[], float value[], float ratio[], int n) {
 
 // Core solver: packs knapsack in greedy order, taking whole items or a fraction
 float knapsack(float weight[], float value[], int n, float capacity) {
-    float current_weight = 0.0; // Tracks total weight accumulated in the knapsack 
+    float track_weight = 0.0; // Tracks total weight accumulated in the knapsack 
     float total_profit = 0.0;   // Tracks total profit accumulated in the knapsack 
 
     // Iterate through items in their pre-sorted greedy order
     for (int i = 0; i < n; i++) {
-        float remaining = capacity - current_weight; // Compute how much empty space is left
+        float remaining = capacity - track_weight; // Compute how much empty space is left
 
         // Case A: The entire item fits within the remaining space
         if (weight[i] <= remaining) {
-            current_weight += weight[i]; // Add full item weight to the knapsack
+            track_weight += weight[i]; // Add full item weight to the knapsack
             total_profit += value[i];    // Add full item value to the total profit
         } 
         // Case B: The item is too heavy to fit whole, so take a fractional cut
@@ -104,7 +104,7 @@ float knapsack(float weight[], float value[], int n, float capacity) {
         }
     }
 
-    return total_profit; // Return the final calculated profit 
+    return total_profit;  
 }
 
 int main() {
@@ -115,16 +115,15 @@ int main() {
     scanf("%d", &n);
 
     // Arrays to store original values entered by the user
-    float weight[50]; // Stores original weights
-    float value[50];  // Stores original values
-    float ratio[50];  // Stores computed value-to-weight ratio
+    float weight[50]; 
+    float value[50];  
+    float ratio[50]; 
 
     // Temporary working arrays used so sorting doesn't destroy original input
     float work_w[50]; 
     float work_v[50]; 
     float work_r[50]; 
 
-    // Input each item's weight and value, then calculate ratio
     for (int i = 0; i < n; i++) {
         printf("Enter weight and value for item %d: ", i); 
         scanf("%f %f", &weight[i], &value[i]);                 
@@ -140,21 +139,18 @@ int main() {
     clone(weight, value, ratio, work_w, work_v, work_r, n); // Load a fresh copy of original items
     by_value(work_w, work_v, work_r, n);  // Sort items from highest value to lowest
     printf("\n1. Max Value First   -> Total Profit: %.2f\n", knapsack(work_w, work_v, n, capacity));          
-    // Solve and print result for condition 1
 
    
     // 2 lightest weight item first
     clone(weight, value, ratio, work_w, work_v, work_r, n); // Reset working arrays to original input
     by_weight(work_w, work_v, work_r, n);  // Sort items from lightest weight to heaviest
     printf("2. Min Weight First  -> Total Profit: %.2f\n", knapsack(work_w, work_v, n, capacity));          
-    // Solve and print result for condition 2
 
     
     // 3 highest value/weight ratio 
-    clone(weight, value, ratio, work_w, work_v, work_r, n); // Reset working arrays to original input
-    by_ratio(work_w, work_v, work_r, n);  // Sort items from best unit ratio to worst
+    clone(weight, value, ratio, work_w, work_v, work_r, n); 
+    by_ratio(work_w, work_v, work_r, n);  // Sort items from highest value-to-weight ratio to lowest
     printf("3. Max Ratio First   -> Total Profit: %.2f \n", knapsack(work_w, work_v, n, capacity));          
-    // Solve and print result for condition 3
 
     return 0; 
 }

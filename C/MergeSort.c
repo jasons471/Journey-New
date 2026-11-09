@@ -30,12 +30,12 @@ void printArray(int arr[], int size) {
     printf("\n");
 }
 
-// Merge function for ASCENDING order without any pointers
-void mergeAscending(int arr[], int left, int mid, int right) {
+// Merge function for ASCENDING order 
+void mergeAscending(int arr[], int lb, int mid, int ub) {
     // Size of left portion
-    int l1 = mid - left + 1;
+    int l1 = mid - lb + 1;
     // Size of right portion
-    int r1 = right - mid;
+    int r1 = ub - mid;
 
     // Temporary local arrays
     int L[l1];
@@ -44,7 +44,7 @@ void mergeAscending(int arr[], int left, int mid, int right) {
     // Populate temporary left array
     for (int i = 0; i < l1; i++) {
         // Copy item from main array
-        L[i] = arr[left + i];
+        L[i] = arr[lb + i];
         // Increment shifts counter
         shifts++;
     }
@@ -59,15 +59,15 @@ void mergeAscending(int arr[], int left, int mid, int right) {
 
     // Display sub-arrays being merged
     printf("Merging: ");
-    printSubArray(arr, left, mid);
+    printSubArray(arr, lb, mid);
     printf(" + ");
-    printSubArray(arr, mid + 1, right);
+    printSubArray(arr, mid + 1, ub);
     printf("\n");
 
     // Sub-array indexes
     int i = 0;
     int j = 0;
-    int k = left;
+    int k = lb;
 
     // Merge in ascending order
     while (i < l1 && j < r1) {
@@ -118,34 +118,34 @@ void mergeAscending(int arr[], int left, int mid, int right) {
 
     // Display intermediate merged result
     printf("Result:  ");
-    printSubArray(arr, left, right);
+    printSubArray(arr, lb, ub);
     printf("\n\n");
 }
 
-// Recursive Merge Sort function for ASCENDING order without any pointers
-void mergeSortAscending(int arr[], int left, int right) {
+// Recursive Merge Sort function for ASCENDING order 
+void mergeSortAscending(int arr[], int lb, int ub) {
     // Only continue if segment has 2 or more elements
-    if (left < right) {
+    if (lb < ub) {
         // Calculate middle point
-        int mid = left + (right - left) / 2;
+        int mid = lb + (ub - lb) / 2;
 
         // Sort left partition
-        mergeSortAscending(arr, left, mid);
+        mergeSortAscending(arr, lb, mid);
 
         // Sort right partition
-        mergeSortAscending(arr, mid + 1, right);
+        mergeSortAscending(arr, mid + 1, ub);
 
         // Merge both partitions in ascending order
-        mergeAscending(arr, left, mid, right);
+        mergeAscending(arr, lb, mid, ub);
     }
 }
 
-// Merge function for DESCENDING order without any pointers
-void mergeDescending(int arr[], int left, int mid, int right) {
+// Merge function for DESCENDING order 
+void mergeDescending(int arr[], int lb, int mid, int ub) {
     // Size of left portion
-    int l1 = mid - left + 1;
+    int l1 = mid - lb + 1;
     // Size of right portion
-    int r1 = right - mid;
+    int r1 = ub - mid;
 
     // Temporary local arrays
     int L[l1];
@@ -154,7 +154,7 @@ void mergeDescending(int arr[], int left, int mid, int right) {
     // Populate temporary left array
     for (int i = 0; i < l1; i++) {
         // Copy item from main array
-        L[i] = arr[left + i];
+        L[i] = arr[lb + i];
         // Increment shifts counter
         shifts++;
     }
@@ -169,15 +169,15 @@ void mergeDescending(int arr[], int left, int mid, int right) {
 
     // Display sub-arrays being merged
     printf("Merging: ");
-    printSubArray(arr, left, mid);
+    printSubArray(arr, lb, mid);
     printf(" + ");
-    printSubArray(arr, mid + 1, right);
+    printSubArray(arr, mid + 1, ub);
     printf("\n");
 
     // Sub-array indexes
     int i = 0;
     int j = 0;
-    int k = left;
+    int k = lb;
 
     // Merge in descending order
     while (i < l1 && j < r1) {
@@ -228,25 +228,25 @@ void mergeDescending(int arr[], int left, int mid, int right) {
 
     // Display intermediate merged result
     printf("Result:  ");
-    printSubArray(arr, left, right);
+    printSubArray(arr, lb, ub);
     printf("\n\n");
 }
 
-// Recursive Merge Sort function for DESCENDING order without any pointers
-void mergeSortDescending(int arr[], int left, int right) {
+// Recursive Merge Sort function for DESCENDING order 
+void mergeSortDescending(int arr[], int lb, int ub) {
     // Only continue if segment has 2 or more elements
-    if (left < right) {
+    if (lb < ub) {
         // Calculate middle point
-        int mid = left + (right - left) / 2;
+        int mid = lb + (ub - lb) / 2;
 
         // Sort left partition
-        mergeSortDescending(arr, left, mid);
+        mergeSortDescending(arr, lb, mid);
 
         // Sort right partition
-        mergeSortDescending(arr, mid + 1, right);
+        mergeSortDescending(arr, mid + 1, ub);
 
         // Merge both partitions in descending order
-        mergeDescending(arr, left, mid, right);
+        mergeDescending(arr, lb, mid, ub);
     }
 }
 
