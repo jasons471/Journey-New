@@ -1,6 +1,5 @@
 #include <stdio.h> 
 
-
 void printArray(const int arr[], int size) { 
     for (int i = 0; i < size; i++) { 
         printf(" %d", arr[i]); 
@@ -21,12 +20,12 @@ void insertionSortAscending(int arr[], int n) {
     int shifts = 0; // Initialize shift counter to zero
 
     for (int i = 1; i < n; i++) { 
-        int key = arr[i]; // Store current element as key to be placed in the sorted sub-array
+        int temp = arr[i]; // Store current element as key to be placed in the sorted sub-array
         int j = i - 1; // Set index j to point to the element immediately before key
 
         while (j >= 0) { // Loop backwards through sorted portion of array
             comparisons++; // Increment comparison counter for each check
-            if (arr[j] > key) { // Check if element on left is greater than key (ascending order check)
+            if (arr[j] > temp) { // Check if element on left is greater than key (ascending order check)
                 arr[j + 1] = arr[j]; // Shift larger element one position to the right
                 shifts++; // Increment shift counter
                 j--; // Move index j one position to the left
@@ -36,7 +35,7 @@ void insertionSortAscending(int arr[], int n) {
             } 
         } 
 
-        arr[j + 1] = key; // Place key into its correct sorted position
+        arr[j + 1] = temp; // Place key into its correct sorted position
 
         printf("Array after insertion %d:", i); // Print step tracking header
         printArray(arr, n); 
@@ -56,12 +55,12 @@ void insertionSortDescending(int arr[], int n) {
     int shifts = 0; // Initialize shift counter to zero
 
     for (int i = 1; i < n; i++) { 
-        int key = arr[i]; // Store current element as key to be placed in the sorted sub-array
+        int temp = arr[i]; // Store current element as key to be placed in the sorted sub-array
         int j = i - 1; // Set index j to point to the element immediately before key
 
         while (j >= 0) { // Loop backwards through sorted portion of array
             comparisons++; // Increment comparison counter for each check
-            if (arr[j] < key) { // Check if element on left is smaller than key (descending order check)
+            if (arr[j] < temp) { // Check if element on left is smaller than key (descending order check)
                 arr[j + 1] = arr[j]; // Shift smaller element one position to the right
                 shifts++; // Increment shift counter
                 j--; // Move index j one position to the left
@@ -71,7 +70,7 @@ void insertionSortDescending(int arr[], int n) {
             } 
         } 
 
-        arr[j + 1] = key; // Place key into its correct sorted position
+        arr[j + 1] = temp; // Place key into its correct sorted position
 
         printf("Array after insertion %d:", i); 
         printArray(arr, n); 

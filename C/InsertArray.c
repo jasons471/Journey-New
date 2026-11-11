@@ -36,7 +36,7 @@ int Insert_Element(int arr[], int *n) {
 }
 // Function to take array elements from the user
 void Input_Array(int arr[], int n) {
-    int i; // initialization variable
+    int i; 
     for (i = 0; i < n; i++) {
         printf("\n arr[%d] = ", i);
         scanf("%d", &arr[i]);
