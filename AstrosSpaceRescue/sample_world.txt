@@ -1,0 +1,84 @@
+﻿// ASTRO'S SPACE RESCUE: sample world file
+// Lines that start with // are comments. Empty lines are skipped.
+
+
+[FLIGHT]
+FUEL 50
+PLACES 7
+0 Earth_Base
+1 Moon_Camp
+2 Mars_Gate
+3 Asteroid_Belt
+4 Ice_Planet
+5 Comet_Road
+6 Station_Omega
+ROUTES 10
+0 1 4
+0 2 2
+1 3 3
+1 4 7
+2 4 1
+2 5 5
+3 2 -6
+3 5 -2
+4 6 3
+5 6 4
+
+
+[DOOR]
+CODE ASTRONAUT
+
+
+[MAZE]
+ROWS 7
+COLS 9
+OXYGEN 20
+A..#.....
+.#.#.###.
+.#...#...
+.####.#.#
+......#..
+#.###.##.
+...#....C
+
+
+[CARGO]
+CAPACITY 15
+ITEMS 5
+Moon_Dust 5 60
+Liquid_Fuel 8 80
+Star_Powder 4 56
+Space_Sand 6 30
+Ice_Crystal 3 27
+
+
+[MESSAGE]
+TEXT CREW IS SAFE COMING HOME
+
+
+[NETWORK]
+BUDGET 60
+STATIONS 6
+Alpha Beta Gamma Delta Echo Zeta
+LINKS 10
+Alpha Beta 7
+Alpha Gamma 9
+Alpha Zeta 14
+Beta Gamma 10
+Beta Delta 15
+Gamma Delta 11
+Gamma Zeta 2
+Delta Echo 6
+Echo Zeta 8
+Beta Zeta 12
+
+
+[HALL]
+PLAYERS 7
+Nova 512
+Luna 418
+Orbit 380
+Comet 512
+Rocket 418
+Meteor 275
+Galaxy 520
