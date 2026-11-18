@@ -1,15 +1,28 @@
 #include<bits/stdc++.h>
 using namespace std;
+const int INF = 1e9; // Globally define a large value for infinity
 struct Route {
     int from;
     int to;
     int fuel;
 };
-
+/* u = station id(source) 
+ v = station id(destination)
+weight = fuel cost
+dist[] = distance array
+parent[] = parent array  */
+bool relax(int u, int v, int weight, int dist[], int parent[]) {
+    if (dist[u] != INF && dist[u] + weight < dist[v]) {
+        dist[v] = dist[u] + weight;
+        parent[v] = u;
+        return true;
+    }
+    return false;
+}
 int level1(){
-    ifstream file("sample_world_2.txt");
+    ifstream file("sample_world.txt");
     if (!file) {
-        cout << "Error: Could not open sample_world_2.txt\n";
+        cout << "Error: Could not open sample_world.txt\n";
         return -1;
     }
     string line, word;
@@ -26,11 +39,12 @@ int level1(){
             break;
         }
     }
+    // Read the flight information
     file>>word>>startFuel;
     file>>word>>numPlaces;
     file>>word>>numRoutes;
     for (int i = 0; i < numPlaces; i++) {
-    // Read the station name
+    // Read the station name in a temporary variable
         string name;
         int id;
     // temporary variable to hold station number
@@ -41,6 +55,25 @@ int level1(){
         file >> routes[i].from >> routes[i].to >> routes[i].fuel;
     }
     file.close();
+
+    int dist[105], parent[105];
+    int src = 0;
+     // Assuming the source station is the first one (index 0)
+    for(int v = 0; v < numPlaces; v++) {
+        dist[v] = INF;
+        parent[v] = -1;
+//there is no parent for the vertex v initially
+    }
+    dist[src] = 0; // Distance from source to itself is 0
+    for(int pass = 1;pass<=numPlaces;pass++){
+        for(int i=0;i<numRoutes;i++){
+            bool updated = relax(routes[i].from,routes[i].to,routes[i].fuel,dist,parent);
+            if(updated && pass == numPlaces){
+                cout<<"BROKEN MAP\n";
+                return -1;
+            }
+                
+    }
 }
 
 void menu() {
