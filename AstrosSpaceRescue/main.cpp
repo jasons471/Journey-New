@@ -1,6 +1,8 @@
 #include<bits/stdc++.h>
 using namespace std;
 const int INF = 1e9; // Globally define a large value for infinity
+/* Custom structure to bundle 
+a single one-way flight route's details together*/
 struct Route {
     int from;
     int to;
@@ -19,6 +21,8 @@ bool relax(int u, int v, int weight, int dist[], int parent[]) {
     }
     return false;
 }
+//level 1 (Bellman-Ford)
+
 int level1(){
     ifstream file("sample_world.txt");
     if (!file) {
@@ -31,7 +35,7 @@ int level1(){
     Route routes[1005];
 
     // Read the file line by line
-    while (getline(cin, line)) {
+    while (getline(file, line)) {
         if (line.empty() ||line.substr(0, 2) == "//") {
             continue;
         }
@@ -39,42 +43,95 @@ int level1(){
             break;
         }
     }
-    // Read the flight information
+    /*Read FUEL, PLACES, and 
+    ROUTES data from the [FLIGHT] section*/
     file>>word>>startFuel;
     file>>word>>numPlaces;
-    file>>word>>numRoutes;
     for (int i = 0; i < numPlaces; i++) {
     // Read the station name in a temporary variable
         string name;
         int id;
     // temporary variable to hold station number
         file>>id>>name;
-        placeNames[i] = name;
+        placeNames[id] = name;
     }
+    file>>word>>numRoutes;
     for (int i = 0; i < numRoutes; i++) {
         file >> routes[i].from >> routes[i].to >> routes[i].fuel;
     }
     file.close();
 
-    int dist[105], parent[105];
+    //Core: Bellman-Ford algorithm
+    int min_fuel[105], parent[105];
     int src = 0;
      // Assuming the source station is the first one (index 0)
     for(int v = 0; v < numPlaces; v++) {
-        dist[v] = INF;
+        min_fuel[v] = INF;
         parent[v] = -1;
 //there is no parent for the vertex v initially
     }
-    dist[src] = 0; // Distance from source to itself is 0
+    min_fuel[src] = 0; // Distance from source to itself is 0
     for(int pass = 1;pass<=numPlaces;pass++){
         for(int i=0;i<numRoutes;i++){
-            bool updated = relax(routes[i].from,routes[i].to,routes[i].fuel,dist,parent);
+            bool updated = relax(routes[i].from,routes[i].to,routes[i].fuel,min_fuel,parent);
             if(updated && pass == numPlaces){
                 cout<<"BROKEN MAP\n";
                 return -1;
             }
-                
+        }
     }
-}
+//condition check for destination unreachable or fuel is not enough
+ int destination = numPlaces - 1;
+ /* numPlaces -1 gives the exact ID number
+  of the final desination*/
+    if (min_fuel[destination] == INF || min_fuel[destination] > startFuel) {
+        cout << "GAME OVER\n";
+        return -1;
+    }
+    /*Reconstruct the winning route by walking backward 
+    through parent[] breadcrumbs*/
+    int routeStops[105];       
+     // Empty list to store the station numbers
+    int totalStops = 0;      
+    // Counter starting at 0 items
+
+    int currentStation = destination; 
+    // Start standing at the last station (Station_Omega)
+
+    while (currentStation != -1) {    
+// Keep walking backward until we pass Earth_Base (-1)
+        routeStops[totalStops] = currentStation; 
+// Save the station we are standing on
+        totalStops++; 
+        currentStation = parent[currentStation];  
+         // Jump backward to the previous station
+    }
+// Print the route in forward order (from the end of path[] down to index 0)
+    cout << "Best route: ";
+    for (int i = totalStops - 1; i >= 0; i--) {
+        cout << placeNames[routeStops[i]]; // Look up and print the station's text name
+        if (i > 0) cout << " -> ";   // Print an arrow between stations (skip after the last one)
+    }
+    cout << "\n";
+/* Calculate fuel statistics and 
+return remaining fuel as Level 1's score*/
+    int fuelUsed = min_fuel[destination]; 
+    // Total fuel spent on the cheapest route
+    int fuelLeft = startFuel - fuelUsed; 
+    // Remaining fuel in Astro's tank
+    int points = fuelLeft; 
+// Level 1 awards 1 point for each unit of remaining fuel
+    cout << "Fuel used = " << fuelUsed << ", ";  
+    cout << "Fuel left = " << fuelLeft << ", "; 
+    cout << "Points = " << points << endl;  
+    return points;
+}  
+
+//level 2 (LCS)
+
+//level 3 (BFS)
+
+//level 4  0/1 Knapsack
 
 void menu() {
     int button;
