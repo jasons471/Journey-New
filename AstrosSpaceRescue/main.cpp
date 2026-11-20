@@ -490,5 +490,5 @@ void playFullGame() {
     cin >> playerName;                 
     cout << "Welcome, Pilot " << playerName << "! Preparing Level 1...\n";
 
-    // Level 1 call will go right here next
+    
 }
