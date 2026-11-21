@@ -1,14 +1,14 @@
 #include<bits/stdc++.h>
 using namespace std;
 const int INF = 1e9; // Globally define a large value for infinity
-/* Custom structure to bundle 
+/* Custom structure to bundle
 a single one-way flight route's details together*/
 struct Route {
     int from;
     int to;
     int fuel;
 };
-/* u = station id(source) 
+/* u = station id(source)
  v = station id(destination)
 weight = fuel cost
 dist[] = distance array
@@ -43,7 +43,7 @@ int level1(){
             break;
         }
     }
-    /*Read FUEL, PLACES, and 
+    /*Read FUEL, PLACES, and
     ROUTES data from the [FLIGHT] section*/
     file>>word>>startFuel;
     file>>word>>numPlaces;
@@ -88,22 +88,22 @@ int level1(){
         cout << "GAME OVER\n";
         return -1;
     }
-    /*Reconstruct the winning route by walking backward 
+    /*Reconstruct the winning route by walking backward
     through parent[] breadcrumbs*/
-    int routeStops[105];       
+    int routeStops[105];
      // Empty list to store the station numbers
-    int totalStops = 0;      
+    int totalStops = 0;
     // Counter starting at 0 items
 
-    int currentStation = destination; 
+    int currentStation = destination;
     // Start standing at the last station (Station_Omega)
 
-    while (currentStation != -1) {    
+    while (currentStation != -1) {
 // Keep walking backward until we pass Earth_Base (-1)
-        routeStops[totalStops] = currentStation; 
+        routeStops[totalStops] = currentStation;
 // Save the station we are standing on
-        totalStops++; 
-        currentStation = parent[currentStation];  
+        totalStops++;
+        currentStation = parent[currentStation];
          // Jump backward to the previous station
     }
 // Print the route in forward order (from the end of path[] down to index 0)
@@ -113,19 +113,19 @@ int level1(){
         if (i > 0) cout << " -> ";   // Print an arrow between stations (skip after the last one)
     }
     cout << "\n";
-/* Calculate fuel statistics and 
+/* Calculate fuel statistics and
 return remaining fuel as Level 1's score*/
-    int fuelUsed = min_fuel[destination]; 
+    int fuelUsed = min_fuel[destination];
     // Total fuel spent on the cheapest route
-    int fuelLeft = startFuel - fuelUsed; 
+    int fuelLeft = startFuel - fuelUsed;
     // Remaining fuel in Astro's tank
-    int points = fuelLeft; 
+    int points = fuelLeft;
 // Level 1 awards 1 point for each unit of remaining fuel
-    cout << "Fuel used = " << fuelUsed << ", ";  
-    cout << "Fuel left = " << fuelLeft << ", "; 
-    cout << "Points = " << points << endl;  
+    cout << "Fuel used = " << fuelUsed << ", ";
+    cout << "Fuel left = " << fuelLeft << ", ";
+    cout << "Points = " << points << endl;
     return points;
-}  
+}
 
 //level 2 (LCS)
 // Calculates LCS and also reconstructs the matching letters.
@@ -336,6 +336,269 @@ int level2() {
 
 //level 3 (BFS)
 
+
+// Level : FIND THE CREW (BREADTH-FIRST SEARCH)
+
+// Direction arrays for Up, Down, Left and Right.
+int rowMove[4] = {-1, 1, 0, 0};
+int colMove[4] = {0, 0, -1, 1};
+
+
+int level3() {
+
+    ifstream file("sample_world.txt");
+
+    if (!file) {
+        cout << "Error: Could not open sample_world.txt\n";
+        return 0;
+    }
+
+    string line;
+    int rows = 0, cols = 0, oxygen = 0;
+    string word;
+
+    // Find the MAZE section.
+    while (getline(file, line)) {
+
+        if (line == "[MAZE]") {
+            break;
+        }
+    }
+
+    if (!file) {
+        cout << "Error: MAZE section not found!\n";
+        return 0;
+    }
+
+    // Read maze information.
+    file >> word >> rows;
+    file >> word >> cols;
+    file >> word >> oxygen;
+
+    // Validate maze dimensions.
+    if (rows <= 0 || rows > 50 ||
+        cols <= 0 || cols > 50) {
+
+        cout << "Error: Invalid maze dimensions!\n";
+        return 0;
+    }
+
+    // Store the maze.
+    vector<string> maze(rows);
+
+    for (int i = 0; i < rows; i++) {
+
+        file >> maze[i];
+
+        if (maze[i].length() != cols) {
+            cout << "Error: Invalid maze row!\n";
+            return 0;
+        }
+    }
+
+    file.close();
+
+    // Find starting position A and destination C.
+    int startRow = -1, startCol = -1;
+    int endRow = -1, endCol = -1;
+
+    for (int i = 0; i < rows; i++) {
+
+        for (int j = 0; j < cols; j++) {
+
+            if (maze[i][j] == 'A') {
+                startRow = i;
+                startCol = j;
+            }
+
+            if (maze[i][j] == 'C') {
+                endRow = i;
+                endCol = j;
+            }
+        }
+    }
+
+    if (startRow == -1 || endRow == -1) {
+
+        cout << "Error: Starting point or crew not found!\n";
+        return 0;
+    }
+
+
+    // BFS DATA STRUCTURES
+
+    // Stores minimum distance from A to each cell.
+    vector<vector<int>> distance(
+        rows, vector<int>(cols, -1)
+    );
+
+    // Stores the previous row and column.
+    vector<vector<int>> parentRow(
+        rows, vector<int>(cols, -1)
+    );
+
+    vector<vector<int>> parentCol(
+        rows, vector<int>(cols, -1)
+    );
+
+    // Queue stores the coordinates of cells.
+    queue<pair<int, int>> q;
+
+
+    // Start BFS from A.
+    q.push({startRow, startCol});
+
+    distance[startRow][startCol] = 0;
+
+
+    cout << "\n========== LEVEL 3 ==========\n";
+    cout << "MISSION: FIND THE CREW\n";
+
+    cout << "Starting BFS exploration...\n";
+
+
+    // BREADTH-FIRST SEARCH
+
+    while (!q.empty()) {
+
+        // Get the front cell from the queue.
+        int currentRow = q.front().first;
+        int currentCol = q.front().second;
+
+        q.pop();
+
+
+        // Stop when the crew is reached.
+        if (currentRow == endRow &&
+            currentCol == endCol) {
+
+            break;
+        }
+
+
+        // Explore all four directions.
+        for (int d = 0; d < 4; d++) {
+
+            int newRow = currentRow + rowMove[d];
+            int newCol = currentCol + colMove[d];
+
+
+            // Check whether the new position is inside the maze.
+            if (newRow >= 0 && newRow < rows &&
+                newCol >= 0 && newCol < cols) {
+
+
+                // Check whether the cell is not a wall
+                // and has not been visited before.
+                if (maze[newRow][newCol] != '#' &&
+                    distance[newRow][newCol] == -1) {
+
+
+                    // Calculate distance.
+                    distance[newRow][newCol] =
+                        distance[currentRow][currentCol] + 1;
+
+
+                    // Store the parent coordinates.
+                    parentRow[newRow][newCol] = currentRow;
+                    parentCol[newRow][newCol] = currentCol;
+
+
+                    // Add the new cell to the queue.
+                    q.push({newRow, newCol});
+                }
+            }
+        }
+    }
+
+
+    // CHECK WHETHER THE CREW CAN BE REACHED.
+
+    if (distance[endRow][endCol] == -1) {
+
+        cout << "No path found to the crew!\n";
+        cout << "GAME OVER\n";
+        cout << "Points earned = 0\n";
+
+        return 0;
+    }
+
+
+    // Calculate shortest distance and remaining oxygen.
+    int steps = distance[endRow][endCol];
+
+    int oxygenLeft = oxygen - steps;
+
+
+    cout << "Fewest steps = " << steps << "\n";
+    cout << "Oxygen available = " << oxygen << "\n";
+    cout << "Oxygen left = " << oxygenLeft << "\n";
+
+
+    // CHECK OXYGEN AVAILABILITY.
+
+    if (oxygenLeft < 0) {
+
+        cout << "\nNot enough oxygen to reach the crew!\n";
+        cout << "GAME OVER\n";
+        cout << "Points earned = 0\n";
+
+        return 0;
+    }
+
+
+    // RECONSTRUCT THE SHORTEST PATH.
+
+    int currentRow = endRow;
+    int currentCol = endCol;
+
+    // Mark the shortest path with *.
+    while (!(currentRow == startRow &&
+             currentCol == startCol)) {
+
+        if (maze[currentRow][currentCol] == '.') {
+            maze[currentRow][currentCol] = '*';
+        }
+
+        int previousRow = parentRow[currentRow][currentCol];
+        int previousCol = parentCol[currentRow][currentCol];
+
+        currentRow = previousRow;
+        currentCol = previousCol;
+    }
+
+
+    // DISPLAY THE MAZE WITH THE SHORTEST PATH.
+
+    cout << "\nShortest path (*):\n";
+
+    for (int i = 0; i < rows; i++) {
+
+        for (int j = 0; j < cols; j++) {
+
+            cout << maze[i][j];
+        }
+
+        cout << "\n";
+    }
+
+
+    // CALCULATE POINTS.
+
+    int points = oxygenLeft;
+
+    cout << "\n*** CREW RESCUED! ***\n";
+
+    cout << "Astro successfully reached the crew!\n";
+
+    cout << "Points earned = " << points << "\n";
+
+    cout << "============================\n";
+
+    return points;
+}
+
+
 //level 4  0/1 Knapsack
 
  int getMax(int firstVal, int secondVal) {
@@ -348,7 +611,7 @@ int level2() {
 int knapsack01(int capacity,string itemName[],int Weight[],int Value[],int itemCount ){
     int DPTable[105][105];
     for (int currentCap = 0; currentCap <= capacity; currentCap++) {
-        DPTable[0][currentCap] = 0;   
+        DPTable[0][currentCap] = 0;
     }
     for (int item = 1; item <= itemCount; item++) {
        DPTable [item][0] = 0;
@@ -364,7 +627,7 @@ int knapsack01(int capacity,string itemName[],int Weight[],int Value[],int itemC
                 // Too heavy to fit, so copy the value from above
                 DPTable[item][currentCap] = DPTable[item - 1][currentCap];
             }
-        }   
+        }
     }
     // Backtrack to find which items were chosen
     string chosenNames[105]; // Stores the names of packed items
@@ -382,19 +645,19 @@ int knapsack01(int capacity,string itemName[],int Weight[],int Value[],int itemC
     // Print the max items that Astro selected to pack in his spaceship
     cout << "Packed cargo: ";
     if (chosenCount == 0) {
-        cout << "None"; 
-    } 
+        cout << "None";
+    }
     else {
-/* Loop backward so the selected items print in the same order 
+/* Loop backward so the selected items print in the same order
 as the map file*/
         for (int i = chosenCount - 1; i >= 0; i--) {
-            cout << chosenNames[i];     
-            if (i > 0) cout << ", ";     
+            cout << chosenNames[i];
+            if (i > 0) cout << ", ";
         }
     }
     cout << "\n";
     cout << "Total weight = " << totalWeight << "/" << capacity << endl;
-    return DPTable[itemCount][capacity]; 
+    return DPTable[itemCount][capacity];
     // Return the max value that can be packed
 }
 int level4(){
@@ -403,18 +666,18 @@ int level4(){
         cout << "Error: Could not open sample_world.txt"<< endl;
         return -1;
     }
-   string line,word;              
-   // Holds one full line of text while scanning for [CARGO]            
+   string line,word;
+   // Holds one full line of text while scanning for [CARGO]
     // Temporary bucket to catch label words like "CAPACITY" and "ITEMS"
-    int capacity = 0, itemCount = 0;         
-    // Stores the maximum weight the spaceship can carry (15)        
+    int capacity = 0, itemCount = 0;
+    // Stores the maximum weight the spaceship can carry (15)
     // Stores how many items are available to choose from (5)
-    string itemNames[105];    
+    string itemNames[105];
     // Array storing each item's text name (e.g., "Moon_Dust")
-    int weights[105];         
+    int weights[105];
     // Array storing each item's weight
-    int values[105];         
-     // Array storing each item's point value 
+    int values[105];
+     // Array storing each item's point value
 
      while (getline(file, line)) {
         if (line.empty() || line.substr(0, 2) == "//") {
@@ -426,7 +689,7 @@ int level4(){
         }
     }
     file >> word >> capacity; // Read the spaceship's cargo capacity
-    file >> word >> itemCount; 
+    file >> word >> itemCount;
     // Read how many items are available to choose from
 
     // Loop 'itemCount' times to read each item's 3 pieces of data into our arrays
@@ -495,8 +758,8 @@ void playFullGame() {
 
     cout << "\n--- STARTING FULL GAME ---\n";
     cout << "Enter pilot name: ";
-    cin >> playerName;                 
+    cin >> playerName;
     cout << "Welcome, Pilot " << playerName << "! Preparing Level 1...\n";
 
-    
+
 }
