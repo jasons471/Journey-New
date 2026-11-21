@@ -445,6 +445,14 @@ int level4(){
     return points;
 
 }
+
+// level 5
+
+// level 6
+
+// level 7
+
+
 //Menu table
 void menu() {
     int button;
