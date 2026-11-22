@@ -336,9 +336,6 @@ int level2() {
 
 //level 3 (BFS)
 
-
-// Level : FIND THE CREW (BREADTH-FIRST SEARCH)
-
 // Direction arrays for Up, Down, Left and Right.
 int rowMove[4] = {-1, 1, 0, 0};
 int colMove[4] = {0, 0, -1, 1};
@@ -451,7 +448,7 @@ int level3() {
     distance[startRow][startCol] = 0;
 
 
-    cout << "\n========== LEVEL 3 ==========\n";
+    cout << "LEVEL 3"<<endl;
     cout << "MISSION: FIND THE CREW\n";
 
     cout << "Starting BFS exploration...\n";

@@ -1,5 +1,10 @@
+package src;
+/* This is a simple Swing application 
+that creates a window with a label */
+
 import javax.swing.JFrame;
 import javax.swing.JLabel;
+import javax.swing.JPanel;
 import javax.swing.BorderFactory;
 /*javax.swing is a package that provides classes for building graphical user interfaces (GUIs) in Java. 
 JFrame is a class within this package that represents a window in a Swing application.
@@ -62,6 +67,7 @@ label.setFont(new Font("MV Boli", Font.PLAIN, 20));
 //label.setIconTextGap(-25);
 //this sets the gap between the text and the icon within the label 
 label.setBackground(Color.YELLOW);
+/* this sets the background color of the label to yellow */
 label.setOpaque(true);
 /* this makes the background of the label opaque, 
 meaning it will be filled with the background color */
@@ -81,5 +87,14 @@ frame.setLayout(null);
 allowing for absolute positioning of components */
 frame.pack();
 /* this packs the frame to fit its components */
+
+/*JPanel is a class that represents a container for other components */
+  JPanel panel = new JPanel();
+  /* this creates a new instance of JPanel */
+  panel.setBackground(Color.ORANGE);
+  panel.setBounds(0, 0, 100, 100);
+  frame.add(panel);
+
+
     }
 }
