@@ -657,7 +657,7 @@ as the map file*/
     return DPTable[itemCount][capacity];
     // Return the max value that can be packed
 }
-int level4(){
+    int level4(){
     ifstream file("sample_world.txt");
     if (!file) {
         cout << "Error: Could not open sample_world.txt"<< endl;
