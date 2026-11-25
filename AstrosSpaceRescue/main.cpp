@@ -43,6 +43,10 @@ int level1(){
             break;
         }
     }
+    if (!file) {
+        cout << "Error: FLIGHT section not found!\n";
+        return -1;
+    }
     /*Read FUEL, PLACES, and
     ROUTES data from the [FLIGHT] section*/
     file>>word>>startFuel;
@@ -190,7 +194,7 @@ int level2() {
     if (!file) {
 
         cout << "Error: Could not open sample_world.txt\n";
-        return 0;
+        return -1;
     }
 
     string line;
@@ -231,7 +235,7 @@ int level2() {
     if (secret.empty()) {
 
         cout << "Error: Door code not found!\n";
-        return 0;
+        return -1;
     }
 
     // Convert secret code to uppercase.
@@ -266,6 +270,12 @@ int level2() {
         cout << "Enter your code: ";
 
         cin >> player;
+        cin.ignore(10000, '\n'); // Throw away anything typed after a space
+
+        // dp table in calculateLCS() is only 101 x 101, so cap the guess.
+        if (player.length() > 100) {
+            player = player.substr(0, 100);
+        }
 
         // Convert player's code to uppercase.
         for (char &ch : player) {
@@ -326,7 +336,7 @@ int level2() {
         cout << "The door remains locked.\n";
         cout << "Points earned = 0\n";
 
-        points = 0;
+        points = -1; // -1 tells the caller the mission failed
     }
 
     cout << "=============================\n";
@@ -347,7 +357,7 @@ int level3() {
 
     if (!file) {
         cout << "Error: Could not open sample_world.txt\n";
-        return 0;
+        return -1;
     }
 
     string line;
@@ -364,7 +374,7 @@ int level3() {
 
     if (!file) {
         cout << "Error: MAZE section not found!\n";
-        return 0;
+        return -1;
     }
 
     // Read maze information.
@@ -377,7 +387,7 @@ int level3() {
         cols <= 0 || cols > 50) {
 
         cout << "Error: Invalid maze dimensions!\n";
-        return 0;
+        return -1;
     }
 
     // Store the maze.
@@ -387,9 +397,9 @@ int level3() {
 
         file >> maze[i];
 
-        if (maze[i].length() != cols) {
+        if ((int)maze[i].length() != cols) {
             cout << "Error: Invalid maze row!\n";
-            return 0;
+            return -1;
         }
     }
 
@@ -418,7 +428,7 @@ int level3() {
     if (startRow == -1 || endRow == -1) {
 
         cout << "Error: Starting point or crew not found!\n";
-        return 0;
+        return -1;
     }
 
 
@@ -517,7 +527,7 @@ int level3() {
         cout << "GAME OVER\n";
         cout << "Points earned = 0\n";
 
-        return 0;
+        return -1;
     }
 
 
@@ -540,7 +550,7 @@ int level3() {
         cout << "GAME OVER\n";
         cout << "Points earned = 0\n";
 
-        return 0;
+        return -1;
     }
 
 
@@ -708,33 +718,33 @@ as the map file*/
 
 // level 5 (Huffman Coding)
 
-char huffChar[200];   
+char huffChar[200];
  // Stores the character at each tree node (leaves hold letters/spaces)
-int huffFreq[200];      
+int huffFreq[200];
 // Stores the frequency (count) of each node
-int leftChild[200];     
-// Index of the left child in the tree 
-int rightChild[200];    
-// Index of the right child in the tree 
-int totalNodes = 0;     
+int leftChild[200];
+// Index of the left child in the tree
+int rightChild[200];
+// Index of the right child in the tree
+int totalNodes = 0;
 // Counts total nodes created in the Huffman tree
 
-int huffQueue[100];     
+int huffQueue[100];
 // Simple array acting as our Min-Priority Queue (holds node indices)
-int qSize = 0;          
+int qSize = 0;
 // Current number of active nodes waiting inside huffQueue/Queue Size
 
 //Inserts a node index 'nodeIdx' into the priority queue
 void insertQueue(int nodeIdx) {
-    huffQueue[qSize] = nodeIdx; 
+    huffQueue[qSize] = nodeIdx;
     // Place the new node at the end of the queue
-    qSize++;                    
+    qSize++;
 }
 
-/* Finds, removes, and returns the node index 
+/* Finds, removes, and returns the node index
 with the smallest frequency*/
 int extractMin() {
-    int minPos = 0; 
+    int minPos = 0;
     // Assume the first item in huffQueue has the smallest frequency
 
     // Scan the rest of huffQueue to find the true smallest frequency
@@ -744,30 +754,30 @@ int extractMin() {
         }
     }
 
-    int minNode = huffQueue[minPos];          
+    int minNode = huffQueue[minPos];
     // Save the winning node index to return
-    huffQueue[minPos] = huffQueue[qSize - 1]; 
+    huffQueue[minPos] = huffQueue[qSize - 1];
     // Fill the gap by moving the last item into minPos
-    qSize--;                                  
+    qSize--;
     // Shrink the queue size by 1
-    return minNode;                           
+    return minNode;
 }
 
 /* Core function to build the Huffman Tree */
 int buildHuffmanTree(char uniqueChars[], int charFreqs[], int uniqueCount) {
     // 1. Create a leaf node for every unique character and push it into huffQueue
     for (int i = 0; i < uniqueCount; i++) {
-        huffChar[totalNodes] = uniqueChars[i]; 
+        huffChar[totalNodes] = uniqueChars[i];
         // Store character (e.g., 'E', ' ')
-        huffFreq[totalNodes] = charFreqs[i];   
+        huffFreq[totalNodes] = charFreqs[i];
         // Store how many times it appeared
-        leftChild[totalNodes] = -1;            
+        leftChild[totalNodes] = -1;
         // Leaf nodes have no left child
-        rightChild[totalNodes] = -1;           
+        rightChild[totalNodes] = -1;
         // Leaf nodes have no right child
-        insertQueue(totalNodes);              
+        insertQueue(totalNodes);
          // Add this leaf node to the priority queue
-        totalNodes++;                          
+        totalNodes++;
         // Move to next free slot in node arrays
     }
 
@@ -778,27 +788,27 @@ int buildHuffmanTree(char uniqueChars[], int charFreqs[], int uniqueCount) {
 
     // 2. Merge the two smallest nodes (uniqueCount - 1) times to build the tree
     for (int i = 1; i <= uniqueCount - 1; i++) {
-        int parentNode = totalNodes++; 
+        int parentNode = totalNodes++;
         // Allocate a brand-new internal parent node
 
-        int x = extractMin();         
+        int x = extractMin();
          // Pull out the smallest-frequency node
-        leftChild[parentNode] = x;     
+        leftChild[parentNode] = x;
         // Attach it as the left child (represents bit '0')
 
-        int y = extractMin();          
+        int y = extractMin();
         // Pull out the second-smallest frequency node
-        rightChild[parentNode] = y;    
+        rightChild[parentNode] = y;
         // Attach it as the right child (represents bit '1')
 
     // Parent's frequency is the sum of its two children's frequencies
         huffFreq[parentNode] = huffFreq[x] + huffFreq[y];
 
-        insertQueue(parentNode); 
+        insertQueue(parentNode);
          // Put the new combined parent node back into the queue
     }
 
-    
+
     return extractMin();
 }
 
@@ -807,14 +817,14 @@ int buildHuffmanTree(char uniqueChars[], int charFreqs[], int uniqueCount) {
           to each character leaf, printing every letter's binary signal
            code and saving its compressed bit length.*/
 
-/* 
+/*
   currentNode: The index of the current node in the Huffman tree arrays.
   signalBits: An array that temporarily holds the sequence of 0s and 1s
-              representing the path taken from the root to the current 
+              representing the path taken from the root to the current
               node.
   bitDepth: The current depth in the tree, which also indicates how many
             bits have been recorded in signalBits.
-  charBitLengths: An array that will store the final bit length for 
+  charBitLengths: An array that will store the final bit length for
                  each character once its leaf node is reached.
 */
 
@@ -831,14 +841,14 @@ void buildSignalCodes(int currentNode, int signalBits[], int bitDepth, int charB
         buildSignalCodes(rightChild[currentNode], signalBits, bitDepth + 1, charBitLengths);
     }
 
-    /*Base case: reached a leaf node (both children are -1), 
+    /*Base case: reached a leaf node (both children are -1),
     meaning we found a character */
     if (leftChild[currentNode] == -1 && rightChild[currentNode] == -1) {
-        int finalBitLen = bitDepth; 
+        int finalBitLen = bitDepth;
     // Normally, the code length equals how many steps down we climbed
 
-/*If the message only had 1 unique letter, bitDepth is 0, 
-   so give it a 1-bit code ('0')*/ 
+/*If the message only had 1 unique letter, bitDepth is 0,
+   so give it a 1-bit code ('0')*/
         if (bitDepth == 0) {
             finalBitLen = 1;
             signalBits[0] = 0;
@@ -852,46 +862,46 @@ void buildSignalCodes(int currentNode, int signalBits[], int bitDepth, int charB
     // this spacing aligns the output for better readability
         }
 
-/*Print the collected 0s and 1s that form this character's 
+/*Print the collected 0s and 1s that form this character's
   compressed signal*/
         for (int i = 0; i < finalBitLen; i++) {
             cout << signalBits[i];
         }
         cout << " (freq = " << huffFreq[currentNode] << ")"<< endl;
 
-/*Save the bit length for this character to calculate total compressed 
+/*Save the bit length for this character to calculate total compressed
 transmission bits*/
-    char letter = huffChar[currentNode];
+    unsigned char letter = huffChar[currentNode];
     charBitLengths[letter] = finalBitLen;
     }
 }
 
 //ASCII character frequency counter
 int countCharacterFrequencies(string message, char uniqueChars[], int charFreqs[]) {
-    int asciiCount[256] = {0}; 
+    int asciiCount[256] = {0};
 // Frequency table for all standard ASCII characters (initialized to 0)
 
 //Loop through every character in the message and increment its count
     for (int i = 0; i < (int)message.length(); i++) {
-        char ch = message[i];  // Grab the current character (e.g., 'C', 'R', or ' ')
+        unsigned char ch = message[i];  // Grab the current character (e.g., 'C', 'R', or ' ')
         asciiCount[ch]++;      // Add 1 to that character's slot in the ASCII table
     }
 
 //Collect only the characters that appeared at least once into parallel arrays
-    int uniqueCount = 0;       
+    int uniqueCount = 0;
     // Tracks how many distinct characters exist in the message
     for (int asciiCode = 0; asciiCode < 256; asciiCode++) {
         if (asciiCount[asciiCode] > 0) {
-            uniqueChars[uniqueCount] = (char)asciiCode;      
+            uniqueChars[uniqueCount] = (char)asciiCode;
             // Save the character
-            charFreqs[uniqueCount] = asciiCount[asciiCode];   
+            charFreqs[uniqueCount] = asciiCount[asciiCode];
             // Save its frequency count
-            uniqueCount++;                                   
+            uniqueCount++;
              // Move to the next slot
         }
     }
 
-    return uniqueCount; 
+    return uniqueCount;
 }
 
 
@@ -927,7 +937,7 @@ int level5() {
             break;
         }
     }
-    file.close(); 
+    file.close();
 
     if (message.empty()) {
         cout << "Error: No transmission message found!"<< endl;
@@ -941,7 +951,7 @@ int level5() {
 //Count how many times each ASCII character appears in the message
     int asciiCount[256] = {0};
     for (int i = 0; i < (int)message.length(); i++) {
-        char ch = message[i];
+        unsigned char ch = message[i];
         asciiCount[ch]++;
     }
 
@@ -953,7 +963,7 @@ int level5() {
     int uniqueCount = 0;
     // Count of unique characters found in the message
 
-/* Loop through all possible ASCII characters (0-255) 
+/* Loop through all possible ASCII characters (0-255)
    to find characters that actually appear in the message */
     for (int c = 0; c < 256; c++) {
         if (asciiCount[c] > 0) {
@@ -981,7 +991,7 @@ int level5() {
     int compressedBits = 0;
 
     for (int i = 0; i < uniqueCount; i++) {
-        char ch = uniqueChars[i];
+        unsigned char ch = uniqueChars[i];
         compressedBits += charFreqs[i] * codeLengths[ch];
     }
 
@@ -1000,6 +1010,11 @@ int level5() {
 
 // level 7
 
+// Function prototypes so menu() can call them before they are defined
+void playFullGame();
+void playOneLevel();
+void showHallOfFame();
+void showExtraFeatures();
 
 //Menu table
 void menu() {
@@ -1015,6 +1030,13 @@ void menu() {
 
         cout << "Press a button: ";
         cin >> button;
+
+        // If a letter was typed, cin breaks; reset it so the menu doesn't loop forever
+        if (cin.fail()) {
+            cin.clear();
+            cin.ignore(10000, '\n');
+            button = -1;
+        }
 
         switch (button) {
             case 1:
@@ -1055,4 +1077,9 @@ void showHallOfFame(){
 }
 void showExtraFeatures(){
 
+}
+
+int main() {
+    menu();
+    return 0;
 }
