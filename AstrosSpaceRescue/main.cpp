@@ -706,7 +706,295 @@ int level4(){
 
 }
 
-// level 5
+// level 5 (Huffman Coding)
+
+char huffChar[200];   
+ // Stores the character at each tree node (leaves hold letters/spaces)
+int huffFreq[200];      
+// Stores the frequency (count) of each node
+int leftChild[200];     
+// Index of the left child in the tree 
+int rightChild[200];    
+// Index of the right child in the tree 
+int totalNodes = 0;     
+// Counts total nodes created in the Huffman tree
+
+int huffQueue[100];     
+// Simple array acting as our Min-Priority Queue (holds node indices)
+int qSize = 0;          
+// Current number of active nodes waiting inside huffQueue/Queue Size
+
+//Inserts a node index 'nodeIdx' into the priority queue
+void insertQueue(int nodeIdx) {
+    huffQueue[qSize] = nodeIdx; 
+    // Place the new node at the end of the queue
+    qSize++;                    
+}
+
+/* Finds, removes, and returns the node index 
+with the smallest frequency*/
+int extractMin() {
+    int minPos = 0; 
+    // Assume the first item in huffQueue has the smallest frequency
+
+    // Scan the rest of huffQueue to find the true smallest frequency
+    for (int i = 1; i < qSize; i++) {
+        if (huffFreq[huffQueue[i]] < huffFreq[huffQueue[minPos]]) {
+            minPos = i; // if found a smaller frequency, update minPos
+        }
+    }
+
+    int minNode = huffQueue[minPos];          
+    // Save the winning node index to return
+    huffQueue[minPos] = huffQueue[qSize - 1]; 
+    // Fill the gap by moving the last item into minPos
+    qSize--;                                  
+    // Shrink the queue size by 1
+    return minNode;                           
+}
+
+/* Core function to build the Huffman Tree */
+int buildHuffmanTree(char uniqueChars[], int charFreqs[], int uniqueCount) {
+    // 1. Create a leaf node for every unique character and push it into huffQueue
+    for (int i = 0; i < uniqueCount; i++) {
+        huffChar[totalNodes] = uniqueChars[i]; 
+        // Store character (e.g., 'E', ' ')
+        huffFreq[totalNodes] = charFreqs[i];   
+        // Store how many times it appeared
+        leftChild[totalNodes] = -1;            
+        // Leaf nodes have no left child
+        rightChild[totalNodes] = -1;           
+        // Leaf nodes have no right child
+        insertQueue(totalNodes);              
+         // Add this leaf node to the priority queue
+        totalNodes++;                          
+        // Move to next free slot in node arrays
+    }
+
+    // Edge case safety: if the message only had 1 unique character
+    if (uniqueCount == 1) {
+        return extractMin();
+    }
+
+    // 2. Merge the two smallest nodes (uniqueCount - 1) times to build the tree
+    for (int i = 1; i <= uniqueCount - 1; i++) {
+        int parentNode = totalNodes++; 
+        // Allocate a brand-new internal parent node
+
+        int x = extractMin();         
+         // Pull out the smallest-frequency node
+        leftChild[parentNode] = x;     
+        // Attach it as the left child (represents bit '0')
+
+        int y = extractMin();          
+        // Pull out the second-smallest frequency node
+        rightChild[parentNode] = y;    
+        // Attach it as the right child (represents bit '1')
+
+    // Parent's frequency is the sum of its two children's frequencies
+        huffFreq[parentNode] = huffFreq[x] + huffFreq[y];
+
+        insertQueue(parentNode); 
+         // Put the new combined parent node back into the queue
+    }
+
+    
+    return extractMin();
+}
+
+
+/* PURPOSE:  Walks down Astro's Huffman compression tree from the root
+          to each character leaf, printing every letter's binary signal
+           code and saving its compressed bit length.*/
+
+/* 
+  currentNode: The index of the current node in the Huffman tree arrays.
+  signalBits: An array that temporarily holds the sequence of 0s and 1s
+              representing the path taken from the root to the current 
+              node.
+  bitDepth: The current depth in the tree, which also indicates how many
+            bits have been recorded in signalBits.
+  charBitLengths: An array that will store the final bit length for 
+                 each character once its leaf node is reached.
+*/
+
+void buildSignalCodes(int currentNode, int signalBits[], int bitDepth, int charBitLengths[]) {
+    // Go left in the Huffman tree: record a '0' signal bit and move one level deeper
+    if (leftChild[currentNode] != -1) {
+        signalBits[bitDepth] = 0;
+        buildSignalCodes(leftChild[currentNode], signalBits, bitDepth + 1, charBitLengths);
+    }
+
+    // Go right in the Huffman tree: record a '1' signal bit and move one level deeper
+    if (rightChild[currentNode] != -1) {
+        signalBits[bitDepth] = 1;
+        buildSignalCodes(rightChild[currentNode], signalBits, bitDepth + 1, charBitLengths);
+    }
+
+    /*Base case: reached a leaf node (both children are -1), 
+    meaning we found a character */
+    if (leftChild[currentNode] == -1 && rightChild[currentNode] == -1) {
+        int finalBitLen = bitDepth; 
+    // Normally, the code length equals how many steps down we climbed
+
+/*If the message only had 1 unique letter, bitDepth is 0, 
+   so give it a 1-bit code ('0')*/ 
+        if (bitDepth == 0) {
+            finalBitLen = 1;
+            signalBits[0] = 0;
+        }
+
+// Print the character (display "[SPACE]" clearly if it is a space ' ')
+        if (huffChar[currentNode] == ' ') {
+            cout << "  '[SPACE]' : ";
+        } else {
+            cout << "  '" << huffChar[currentNode] << "'     : ";
+    // this spacing aligns the output for better readability
+        }
+
+/*Print the collected 0s and 1s that form this character's 
+  compressed signal*/
+        for (int i = 0; i < finalBitLen; i++) {
+            cout << signalBits[i];
+        }
+        cout << " (freq = " << huffFreq[currentNode] << ")"<< endl;
+
+/*Save the bit length for this character to calculate total compressed 
+transmission bits*/
+    char letter = huffChar[currentNode];
+    charBitLengths[letter] = finalBitLen;
+    }
+}
+
+//ASCII character frequency counter
+int countCharacterFrequencies(string message, char uniqueChars[], int charFreqs[]) {
+    int asciiCount[256] = {0}; 
+// Frequency table for all standard ASCII characters (initialized to 0)
+
+//Loop through every character in the message and increment its count
+    for (int i = 0; i < (int)message.length(); i++) {
+        char ch = message[i];  // Grab the current character (e.g., 'C', 'R', or ' ')
+        asciiCount[ch]++;      // Add 1 to that character's slot in the ASCII table
+    }
+
+//Collect only the characters that appeared at least once into parallel arrays
+    int uniqueCount = 0;       
+    // Tracks how many distinct characters exist in the message
+    for (int asciiCode = 0; asciiCode < 256; asciiCode++) {
+        if (asciiCount[asciiCode] > 0) {
+            uniqueChars[uniqueCount] = (char)asciiCode;      
+            // Save the character
+            charFreqs[uniqueCount] = asciiCount[asciiCode];   
+            // Save its frequency count
+            uniqueCount++;                                   
+             // Move to the next slot
+        }
+    }
+
+    return uniqueCount; 
+}
+
+
+int level5() {
+    ifstream file("sample_world.txt");
+    if (!file) {
+        cout << "Error: Could not open sample_world.txt\n";
+        return -1;
+    }
+
+    string line;
+    string message = "";
+
+
+    while (getline(file, line)) {
+        if (line.empty() || line.substr(0, 2) == "//") {
+            continue;
+        }
+        if (line == "[MESSAGE]") {
+            break;
+        }
+    }
+
+    // Read the next non-empty line containing "TEXT CREW IS SAFE COMING HOME"
+    while (getline(file, line)) {
+        if (line.empty() || line.substr(0, 2) == "//") {
+            continue;
+        }
+        // Check if the line starts with "TEXT " (first 5 characters)
+        if (line.size() > 5 && line.substr(0, 5) == "TEXT ") {
+            // substr(5) grabs everything after "TEXT ", preserving all spaces inside the message
+            message = line.substr(5);
+            break;
+        }
+    }
+    file.close(); 
+
+    if (message.empty()) {
+        cout << "Error: No transmission message found!"<< endl;
+        return -1;
+    }
+
+// Reset global tree/queue counters so replaying Level 5 starts fresh
+    totalNodes = 0;
+    qSize = 0;
+
+//Count how many times each ASCII character appears in the message
+    int asciiCount[256] = {0};
+    for (int i = 0; i < (int)message.length(); i++) {
+        char ch = message[i];
+        asciiCount[ch]++;
+    }
+
+// Pack only the characters that actually appeared into parallel arrays
+    char uniqueChars[200];
+    // Stores the unique characters that appeared in the message
+    int charFreqs[200];
+    // Stores how many times each unique character appeared
+    int uniqueCount = 0;
+    // Count of unique characters found in the message
+
+/* Loop through all possible ASCII characters (0-255) 
+   to find characters that actually appear in the message */
+    for (int c = 0; c < 256; c++) {
+        if (asciiCount[c] > 0) {
+            uniqueChars[uniqueCount] = (char)c;
+            charFreqs[uniqueCount] = asciiCount[c];
+            uniqueCount++;
+        }
+    }
+
+    // Display Level 5 mission banner and original text
+    cout << "MISSION: COMPRESS TRANSMISSION"<< endl;
+    cout << "Message: \"" << message << "\"\n"<<endl;
+
+    //Build the Huffman Tree and get the root node index
+    int root = buildHuffmanTree(uniqueChars, charFreqs, uniqueCount);
+
+// Walk the tree to print Huffman codes and store bit lengths
+    int codeBits[100];
+    int codeLengths[256] = {0};
+    cout << "Huffman Code Table:"<<endl;
+   buildSignalCodes(root, codeBits, 0, codeLengths);
+
+    // Step 4: Calculate original bits (8 bits per char) vs. Huffman compressed bits
+    int originalBits = message.length() * 8;
+    int compressedBits = 0;
+
+    for (int i = 0; i < uniqueCount; i++) {
+        char ch = uniqueChars[i];
+        compressedBits += charFreqs[i] * codeLengths[ch];
+    }
+
+    // Award 1 point for every bit saved by compression
+    int points = originalBits - compressedBits;
+    if (points < 0) points = 0;
+
+    cout << "\nOriginal size   = " << originalBits << " bits"<<endl;
+    cout << "Compressed size = " << compressedBits << " bits"<<endl;
+    cout << "Bits saved (Points) = " << points << "bits"<<endl;
+
+    return points;
+}
 
 // level 6
 
@@ -718,13 +1006,12 @@ void menu() {
     int button;
 
     while (true) {
-        cout << "       ASTRO'S SPACE RESCUE        \n";
-        cout << "----------------------------------\n";
-        cout << " 1. Play full game                |\n";
-        cout << " 2. Play one level                |\n";
-        cout << " 3. Show Hall of Fame             |\n";
-        cout << " 4. Extra features                |\n";
-        cout << " 0. Exit                          |\n";
+        cout << "       ASTRO'S SPACE RESCUE        "<< endl;
+        cout << " 1. Play full game                "<< endl;
+        cout << " 2. Play one level                "<< endl;
+        cout << " 3. Show Hall of Fame             "<< endl;
+        cout << " 4. Extra features                "<< endl;
+        cout << " 0. Exit                          "<< endl;
 
         cout << "Press a button: ";
         cin >> button;
@@ -758,5 +1045,14 @@ void playFullGame() {
     cin >> playerName;
     cout << "Welcome, Pilot " << playerName << "! Preparing Level 1...\n";
 
+
+}
+void playOneLevel(){
+
+}
+void showHallOfFame(){
+
+}
+void showExtraFeatures(){
 
 }
